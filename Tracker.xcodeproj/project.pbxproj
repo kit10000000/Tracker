@@ -30,6 +30,37 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		78AE21963023C4AA00047489 /* Exceptions for "Statistics" folder in "Tracker" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				StatisticsViewController.swift,
+			);
+			target = 78D78B65301FA2A300EC6EBF /* Tracker */;
+		};
+		78AE21973023C4AA00047489 /* Exceptions for "Trackers" folder in "Tracker" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				TrackerCollectionViewCell.swift,
+				TrackerSectionHeaderView.swift,
+				TrackersPresenter.swift,
+				TrackersViewController.swift,
+			);
+			target = 78D78B65301FA2A300EC6EBF /* Tracker */;
+		};
+		78AE227830252D2400047489 /* Exceptions for "TrackerTests" folder in "Tracker" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Mocks/MockData.swift,
+			);
+			target = 78D78B65301FA2A300EC6EBF /* Tracker */;
+		};
+		78AE227930252D2400047489 /* Exceptions for "TrackerTests" folder in "TrackerTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Mocks/MockData.swift,
+			);
+			target = 78D78B7B301FA2A400EC6EBF /* TrackerTests */;
+		};
 		78D78B8E301FA2A400EC6EBF /* Exceptions for "Tracker" folder in "Tracker" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -40,6 +71,32 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		78AE218E3023C4AA00047489 /* Statistics */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				78AE21963023C4AA00047489 /* Exceptions for "Statistics" folder in "Tracker" target */,
+			);
+			path = Statistics;
+			sourceTree = "<group>";
+		};
+		78AE21903023C4AA00047489 /* TabBar */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TabBar;
+			sourceTree = "<group>";
+		};
+		78AE21923023C4AA00047489 /* Trackers */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				78AE21973023C4AA00047489 /* Exceptions for "Trackers" folder in "Tracker" target */,
+			);
+			path = Trackers;
+			sourceTree = "<group>";
+		};
+		78AE21983023C4B300047489 /* Models */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Models;
+			sourceTree = "<group>";
+		};
 		78D78B68301FA2A300EC6EBF /* Tracker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -50,6 +107,10 @@
 		};
 		78D78B7F301FA2A400EC6EBF /* TrackerTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				78AE227830252D2400047489 /* Exceptions for "TrackerTests" folder in "Tracker" target */,
+				78AE227930252D2400047489 /* Exceptions for "TrackerTests" folder in "TrackerTests" target */,
+			);
 			path = TrackerTests;
 			sourceTree = "<group>";
 		};
@@ -88,6 +149,10 @@
 		78D78B5D301FA2A300EC6EBF = {
 			isa = PBXGroup;
 			children = (
+				78AE21983023C4B300047489 /* Models */,
+				78AE218E3023C4AA00047489 /* Statistics */,
+				78AE21903023C4AA00047489 /* TabBar */,
+				78AE21923023C4AA00047489 /* Trackers */,
 				78D78B68301FA2A300EC6EBF /* Tracker */,
 				78D78B7F301FA2A400EC6EBF /* TrackerTests */,
 				78D78B89301FA2A400EC6EBF /* TrackerUITests */,
@@ -121,6 +186,8 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				78AE21903023C4AA00047489 /* TabBar */,
+				78AE21983023C4B300047489 /* Models */,
 				78D78B68301FA2A300EC6EBF /* Tracker */,
 			);
 			name = Tracker;
