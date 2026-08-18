@@ -11,9 +11,11 @@ protocol TrackersViewControllerProtocol: AnyObject {
     var presenter: TrackersPresenterProtocol? { get set }
     func showWelcomeScreen()
     func showTrackers()
+    func reloadTrackers()
+    func reloadTracker(at section: Int, _ index: Int)
 }
 
-final class TrackersViewController: UIViewController & TrackersViewControllerProtocol {
+final class TrackersViewController: UIViewController, TrackersViewControllerProtocol {
 
     // MARK: - Constants
 
@@ -61,7 +63,7 @@ final class TrackersViewController: UIViewController & TrackersViewControllerPro
         picker.preferredDatePickerStyle = .compact
         picker.locale = Locale(identifier: "ru_RU")
         picker.addAction(UIAction { [weak self] _ in
-            self?.didTapShowCalendar()
+            self?.datePickerValueChanged()
         }, for: .valueChanged)
         return picker
     }()
@@ -87,6 +89,31 @@ final class TrackersViewController: UIViewController & TrackersViewControllerPro
     }
 
     func showWelcomeScreen() {
+        collectionView.isHidden = true
+        starImageView.isHidden = false
+        welcomeTextLabel.isHidden = false
+    }
+
+    func showTrackers() {
+        collectionView.isHidden = false
+        starImageView.isHidden = true
+        welcomeTextLabel.isHidden = true
+    }
+
+    func reloadTrackers() {
+        collectionView.reloadData()
+    }
+
+    func reloadTracker(at section: Int, _ index: Int) {
+        let indexPath = IndexPath(row: index, section: section)
+        collectionView.reloadItems(at: [indexPath])
+    }
+
+    // MARK: - Private Methods
+
+    private func setupUI() {
+        setupNavigationBar()
+        view.backgroundColor = UIColor(resource: .ypWhite)
         view.addSubview(starImageView)
         view.addSubview(welcomeTextLabel)
         NSLayoutConstraint.activate([
@@ -98,9 +125,7 @@ final class TrackersViewController: UIViewController & TrackersViewControllerPro
             welcomeTextLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             welcomeTextLabel.topAnchor.constraint(equalTo: starImageView.bottomAnchor, constant: Constants.placeholderTextSpacing),
         ])
-    }
 
-    func showTrackers() {
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -111,34 +136,30 @@ final class TrackersViewController: UIViewController & TrackersViewControllerPro
         collectionView.dataSource = self
     }
 
-    // MARK: - Private Methods
-
-    private func setupUI() {
-        setupNavigationBar()
-        view.backgroundColor = UIColor(resource: .ypWhite)
-    }
-
     private func setupNavigationBar() {
         title = "Трекеры"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             image: UIImage(resource: .plus),
-            style: .plain,
-            target: self,
-            action: #selector(didTapAddTracker)
+            primaryAction: UIAction { [weak self] _ in
+                self?.didTapAddTracker()
+            }
         )
         navigationItem.leftBarButtonItem?.tintColor = UIColor(named: "YP Black")
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
-        navigationItem.searchController = UISearchController(searchResultsController: nil)
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        navigationItem.searchController = searchController
     }
 
-    @objc private func didTapAddTracker() {
+    private func didTapAddTracker() {
        print("tapped AddTracker")
     }
 
-    private func didTapShowCalendar() {
-       print("tapped ShowCalendar")
+    private func datePickerValueChanged() {
+        presenter?.didSelectDate(datePicker.date)
     }
 }
 
@@ -158,7 +179,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         guard let trackerModel = presenter?.tracker(at: indexPath.section, indexPath.row, on: datePicker.date) else {
             return UICollectionViewCell()
         }
-        print(trackerModel)
+        trackerCell.delegate = self
         trackerCell.configure(with: trackerModel)
         return cell
     }
@@ -203,5 +224,22 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                         layout collectionViewLayout: UICollectionViewLayout,
                         insetForSectionAt section: Int) -> UIEdgeInsets {
         UIEdgeInsets(top: 0, left: Constants.sideInset, bottom: 0, right: Constants.sideInset)
+    }
+}
+
+// MARK: - UISearchResultsUpdating
+
+extension TrackersViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        presenter?.didChangeSearchText(searchController.searchBar.text ?? "")
+    }
+}
+
+// MARK: - ImagesListCellDelegate
+
+extension TrackersViewController: TrackerCollectionViewCellDelegate {
+    func trackerCollectionViewCellDidTapComplete(_ cell: TrackerCollectionViewCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        presenter?.didTapComplete(at: indexPath.section, indexPath.row, on: datePicker.date)
     }
 }

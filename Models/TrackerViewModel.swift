@@ -12,5 +12,6 @@ struct TrackerViewModel {
     let color: String
     let emoji: String
     let isCompleted: Bool
+    let isCompletionAllowed: Bool
     let count: Int
 }

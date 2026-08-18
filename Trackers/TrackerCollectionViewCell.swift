@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol TrackerCollectionViewCellDelegate: AnyObject {
+    func trackerCollectionViewCellDidTapComplete(_ cell: TrackerCollectionViewCell)
+}
+
 final class TrackerCollectionViewCell: UICollectionViewCell {
 
     // MARK: - Constants
@@ -28,7 +32,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
 
     // MARK: - Properties
 
-    var onCompleteTapped: (() -> Void)?
+    weak var delegate: TrackerCollectionViewCellDelegate?
 
     // MARK: - Private Properties
 
@@ -76,7 +80,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         button.layer.cornerRadius = Constants.buttonCornerRadius
         button.tintColor = .white
         button.addAction(UIAction { [weak self] _ in
-            self?.onCompleteTapped?()
+            self?.onCompleteTapped()
         }, for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -107,6 +111,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         let imageName = tracker.isCompleted ? "checkmark" : "plus"
         completeButton.setImage(UIImage(systemName: imageName), for: .normal)
         completeButton.alpha = tracker.isCompleted ? Constants.completedAlpha : 1.0
+        completeButton.isEnabled = tracker.isCompletionAllowed
     }
 
     // MARK: - Private Methods
@@ -157,5 +162,9 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         case 2...4: return "\(count) дня"
         default: return "\(count) дней"
         }
+    }
+
+    private func onCompleteTapped() {
+        delegate?.trackerCollectionViewCellDidTapComplete(self)
     }
 }

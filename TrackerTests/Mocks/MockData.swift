@@ -5,7 +5,6 @@
 //  Created by Ekaterina on 06.08.2026.
 //
 
-import Foundation
 import UIKit
 
 enum MockData {
