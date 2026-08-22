@@ -1,5 +1,5 @@
 //
-//  TrackerCollectionViewCell.swift
+//  TrackersCollectionViewCell.swift
 //  Tracker
 //
 //  Created by Ekaterina on 06.08.2026.
@@ -7,15 +7,15 @@
 
 import UIKit
 
-protocol TrackerCollectionViewCellDelegate: AnyObject {
-    func trackerCollectionViewCellDidTapComplete(_ cell: TrackerCollectionViewCell)
+protocol TrackersCollectionViewCellDelegate: AnyObject {
+    func trackerCollectionViewCellDidTapComplete(_ cell: TrackersCollectionViewCell)
 }
 
-final class TrackerCollectionViewCell: UICollectionViewCell {
+final class TrackersCollectionViewCell: UICollectionViewCell {
 
     // MARK: - Constants
 
-    static let reuseIdentifier = "TrackerCollectionViewCell"
+    static let reuseIdentifier = "TrackersCollectionViewCell"
 
     private enum Constants {
         static let cardHeight: CGFloat = 90
@@ -32,7 +32,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
 
     // MARK: - Properties
 
-    weak var delegate: TrackerCollectionViewCellDelegate?
+    weak var delegate: TrackersCollectionViewCellDelegate?
 
     // MARK: - Private Properties
 

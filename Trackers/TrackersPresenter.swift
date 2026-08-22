@@ -12,12 +12,13 @@ protocol TrackersPresenterProtocol: AnyObject {
     var categoriesCount: Int { get }
     var trackersCount: Int { get }
     func viewDidLoad()
-    func numberOfTrackers(in row: Int) -> Int
+    func numberOfTrackers(in section: Int) -> Int
     func categoryTitle(at index: Int) -> String
-    func tracker(at section: Int, _ index: Int, on date: Date) -> TrackerViewModel
+    func tracker(at section: Int, _ index: Int) -> TrackerViewModel
     func didSelectDate(_ date: Date)
     func didChangeSearchText(_ query: String)
-    func didTapComplete(at section: Int, _ index: Int, on date: Date)
+    func didTapComplete(at section: Int, _ index: Int)
+    func didAddTracker()
 }
 
 final class TrackersPresenter: TrackersPresenterProtocol {
@@ -27,7 +28,7 @@ final class TrackersPresenter: TrackersPresenterProtocol {
     weak var view: TrackersViewControllerProtocol?
 
     var categoriesCount: Int {
-       visibleCategories.count
+        visibleCategories.count
     }
 
     var trackersCount: Int {
@@ -36,9 +37,10 @@ final class TrackersPresenter: TrackersPresenterProtocol {
 
     // MARK: - Private Properties
 
-    private var categories: [TrackerCategory] = MockData.categories
-    private var completedTrackers: [TrackerRecord] = MockData.completedTrackers
+    private var categories: [TrackerCategory] { TrackerCategoryStorage.shared.categories }
+    private var completedTrackers: [TrackerRecord] { TrackerRecordStorage.shared.completedTrackers }
     private var visibleCategories: [TrackerCategory] = []
+    private var completedIds: Set<UUID> = []
     private var currentDate = Date()
     private var searchQuery = ""
 
@@ -48,59 +50,33 @@ final class TrackersPresenter: TrackersPresenterProtocol {
         updateView()
     }
 
-    func numberOfTrackers(in row: Int) -> Int {
-        visibleCategories[row].trackers.count
+    func numberOfTrackers(in section: Int) -> Int {
+        visibleCategories[section].trackers.count
     }
 
     func categoryTitle(at index: Int) -> String {
         visibleCategories[index].title
     }
 
-    func tracker(at section: Int, _ index: Int, on date: Date) -> TrackerViewModel {
+    func tracker(at section: Int, _ index: Int) -> TrackerViewModel {
         let tracker = visibleCategories[section].trackers[index]
-        let isFuture = Calendar.current.compare(date, to: Date(), toGranularity: .day) == .orderedDescending
+        let isFuture = Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) == .orderedDescending
         return TrackerViewModel(
             title: tracker.title,
             color: tracker.color,
             emoji: tracker.emoji,
-            isCompleted: completedTrackers.contains(where: { $0.trackerId == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: date) }),
+            isCompleted: completedIds.contains(tracker.id),
             isCompletionAllowed: !isFuture,
             count: completedTrackers.count(where: { $0.trackerId == tracker.id })
         )
     }
 
-    func didTapComplete(at section: Int, _ index: Int, on date: Date) {
+    func didTapComplete(at section: Int, _ index: Int) {
         guard Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) != .orderedDescending else { return }
         let tracker = visibleCategories[section].trackers[index]
-
-        if let index = completedTrackers.firstIndex(where: {
-            $0.trackerId == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: date)
-        }) {
-            completedTrackers.remove(at: index)
-        } else {
-            completedTrackers.append(TrackerRecord(trackerId: tracker.id, date: date))
-        }
+        TrackerRecordStorage.shared.toggleRecord(for: tracker.id, on: currentDate)
+        updateCompletedIds()
         view?.reloadTrackers()
-    }
-
-    func addTracker(_ tracker: Tracker, toCategory categoryTitle: String) {
-        var newCategories: [TrackerCategory] = []
-        var added = false
-        for category in categories {
-            if category.title == categoryTitle {
-                newCategories.append(TrackerCategory(
-                    title: category.title,
-                    trackers: category.trackers + [tracker]
-                ))
-                added = true
-            } else {
-                newCategories.append(category)
-            }
-        }
-        if !added {
-            newCategories.append(TrackerCategory(title: categoryTitle, trackers: [tracker]))
-        }
-        categories = newCategories
     }
 
     func didSelectDate(_ date: Date) {
@@ -113,16 +89,33 @@ final class TrackersPresenter: TrackersPresenterProtocol {
         updateView()
     }
 
+    func didAddTracker() {
+        updateView()
+    }
+
     // MARK: - Private Methods
 
     private func updateView() {
         filterVisibleCategories()
+        updateCompletedIds()
         if trackersCount == 0 {
-            view?.showWelcomeScreen()
+            if searchQuery.isEmpty {
+                view?.showWelcomeScreen()
+            } else {
+                view?.showSearchErrorScreen()
+            }
         } else {
             view?.showTrackers()
             view?.reloadTrackers()
         }
+    }
+
+    private func updateCompletedIds() {
+        completedIds = Set(
+            completedTrackers
+                .filter { Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
+                .map { $0.trackerId }
+        )
     }
 
     private func filterVisibleCategories() {

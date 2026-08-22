@@ -10,9 +10,9 @@ import UIKit
 protocol TrackersViewControllerProtocol: AnyObject {
     var presenter: TrackersPresenterProtocol? { get set }
     func showWelcomeScreen()
+    func showSearchErrorScreen()
     func showTrackers()
     func reloadTrackers()
-    func reloadTracker(at section: Int, _ index: Int)
 }
 
 final class TrackersViewController: UIViewController, TrackersViewControllerProtocol {
@@ -48,9 +48,25 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         return imageView
     }()
 
+    private lazy var searchImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(resource: .error)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+
     private lazy var welcomeTextLabel: UILabel = {
         let label = UILabel()
         label.text = "Что будем отслеживать?"
+        label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
+        label.textColor = .ypBlack
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private lazy var searchTextLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Ничего не найдено"
         label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -74,7 +90,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         super.viewDidLoad()
         presenter?.viewDidLoad()
 
-        collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: TrackerCollectionViewCell.reuseIdentifier)
+        collectionView.register(TrackersCollectionViewCell.self, forCellWithReuseIdentifier: TrackersCollectionViewCell.reuseIdentifier)
         collectionView.register(TrackerSectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TrackerSectionHeaderView.reuseIdentifier)
         collectionView.delegate = self
 
@@ -92,21 +108,28 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         collectionView.isHidden = true
         starImageView.isHidden = false
         welcomeTextLabel.isHidden = false
+        searchImageView.isHidden = true
+        searchTextLabel.isHidden = true
+    }
+
+    func showSearchErrorScreen() {
+        collectionView.isHidden = true
+        starImageView.isHidden = true
+        welcomeTextLabel.isHidden = true
+        searchImageView.isHidden = false
+        searchTextLabel.isHidden = false
     }
 
     func showTrackers() {
         collectionView.isHidden = false
         starImageView.isHidden = true
         welcomeTextLabel.isHidden = true
+        searchImageView.isHidden = true
+        searchTextLabel.isHidden = true
     }
 
     func reloadTrackers() {
         collectionView.reloadData()
-    }
-
-    func reloadTracker(at section: Int, _ index: Int) {
-        let indexPath = IndexPath(row: index, section: section)
-        collectionView.reloadItems(at: [indexPath])
     }
 
     // MARK: - Private Methods
@@ -116,6 +139,8 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         view.backgroundColor = UIColor(resource: .ypWhite)
         view.addSubview(starImageView)
         view.addSubview(welcomeTextLabel)
+        view.addSubview(searchImageView)
+        view.addSubview(searchTextLabel)
         NSLayoutConstraint.activate([
             starImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             starImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: Constants.placeholderCenterYOffset),
@@ -124,6 +149,14 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
 
             welcomeTextLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             welcomeTextLabel.topAnchor.constraint(equalTo: starImageView.bottomAnchor, constant: Constants.placeholderTextSpacing),
+
+            searchImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            searchImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: Constants.placeholderCenterYOffset),
+            searchImageView.widthAnchor.constraint(equalToConstant: Constants.placeholderSize),
+            searchImageView.heightAnchor.constraint(equalToConstant: Constants.placeholderSize),
+
+            searchTextLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            searchTextLabel.topAnchor.constraint(equalTo: searchImageView.bottomAnchor, constant: Constants.placeholderTextSpacing),
         ])
 
         view.addSubview(collectionView)
@@ -155,7 +188,10 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     }
 
     private func didTapAddTracker() {
-       print("tapped AddTracker")
+        let newTrackerViewController = NewTrackerViewController()
+        newTrackerViewController.configure(NewTrackerPresenter())
+        newTrackerViewController.delegate = self
+        present(newTrackerViewController, animated: true)
     }
 
     private func datePickerValueChanged() {
@@ -171,12 +207,12 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCollectionViewCell.reuseIdentifier, for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersCollectionViewCell.reuseIdentifier, for: indexPath)
 
-        guard let trackerCell = cell as? TrackerCollectionViewCell else {
+        guard let trackerCell = cell as? TrackersCollectionViewCell else {
             return UICollectionViewCell()
         }
-        guard let trackerModel = presenter?.tracker(at: indexPath.section, indexPath.row, on: datePicker.date) else {
+        guard let trackerModel = presenter?.tracker(at: indexPath.section, indexPath.row) else {
             return UICollectionViewCell()
         }
         trackerCell.delegate = self
@@ -235,11 +271,19 @@ extension TrackersViewController: UISearchResultsUpdating {
     }
 }
 
-// MARK: - ImagesListCellDelegate
+// MARK: - TrackersCollectionViewCellDelegate
 
-extension TrackersViewController: TrackerCollectionViewCellDelegate {
-    func trackerCollectionViewCellDidTapComplete(_ cell: TrackerCollectionViewCell) {
+extension TrackersViewController: TrackersCollectionViewCellDelegate {
+    func trackerCollectionViewCellDidTapComplete(_ cell: TrackersCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        presenter?.didTapComplete(at: indexPath.section, indexPath.row, on: datePicker.date)
+        presenter?.didTapComplete(at: indexPath.section, indexPath.row)
+    }
+}
+
+// MARK: - NewTrackerViewControllerDelegate
+
+extension TrackersViewController: NewTrackerViewControllerDelegate {
+    func didCreateTracker() {
+        presenter?.didAddTracker()
     }
 }
