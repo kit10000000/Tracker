@@ -31,6 +31,19 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     // MARK: - Private Properties
 
     private let settingsItems = ["Категория", "Расписание"]
+    
+    private let scrollView: UIScrollView = {
+        let scroll = UIScrollView()
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        scroll.showsVerticalScrollIndicator = true
+        return scroll
+    }()
+    
+    private let contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
 
     private lazy var titleTextLabel: UILabel = {
         let label = UILabel()
@@ -166,29 +179,46 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private func setupUI() {
         view.backgroundColor = UIColor(resource: .white)
-        view.addSubview(titleTextLabel)
-        view.addSubview(nameFieldStackView)
-        view.addSubview(tableView)
-        view.addSubview(buttonsStackView)
+        view.addSubview(scrollView)
+    
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubview(titleTextLabel)
+        contentView.addSubview(nameFieldStackView)
+        contentView.addSubview(tableView)
+        contentView.addSubview(buttonsStackView)
 
         NSLayoutConstraint.activate([
-            titleTextLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            titleTextLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 27),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            
+            titleTextLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            titleTextLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 27),
 
             nameFieldStackView.topAnchor.constraint(equalTo: titleTextLabel.bottomAnchor, constant: 27),
-            nameFieldStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            nameFieldStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            nameFieldStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            nameFieldStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             nameTextField.heightAnchor.constraint(equalToConstant: 75),
 
-            tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            tableView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             tableView.topAnchor.constraint(equalTo: nameFieldStackView.bottomAnchor, constant: 27),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             tableView.heightAnchor.constraint(equalToConstant: 150),
 
-            buttonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            buttonsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            buttonsStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            buttonsStackView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 20),
+            buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            buttonsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             buttonsStackView.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
