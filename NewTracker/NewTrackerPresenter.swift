@@ -22,7 +22,6 @@ protocol NewTrackerPresenterProtocol: AnyObject {
     func didSelectColor(at index: Int)
     func didSelectEmoji(at index: Int)
     func didTapCreate()
-    
 }
 
 final class NewTrackerPresenter: NewTrackerPresenterProtocol {
@@ -40,8 +39,10 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     var colorsCount: Int {
         colors.count
     }
+
     var emojiSectionTitle: String { emojiTitle }
     var colorSectionTitle: String { colorTitle }
+
     // MARK: - Private Properties
 
     private var name = ""
@@ -57,7 +58,6 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     private let colors = (1...18).map { "Color selection \($0)" }
     private let emojiTitle = "Emoji"
     private let colorTitle = "Цвет"
-
 
     // MARK: - Methods
 
