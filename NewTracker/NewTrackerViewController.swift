@@ -23,6 +23,30 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     static let settingsItemsCellIdentifier = "settingsCell"
 
+    private enum Constants {
+        static let sideInset: CGFloat = 16
+        static let sectionSpacing: CGFloat = 27
+
+        static let nameFieldHeight: CGFloat = 75
+        static let tableHeight: CGFloat = 150
+
+        static let emojiItemsPerRow: CGFloat = 6
+        static let emojiCellHeight: CGFloat = 52
+        static let emojiSectionInset: CGFloat = 8
+        static let emojiInterItemSpacing: CGFloat = 2
+        static let emojiLineSpacing: CGFloat = 7
+        static let emojiRowsCount: CGFloat = 3
+        static let collectionHeaderHeight: CGFloat = 46
+
+        static let buttonsSideInset: CGFloat = 20
+        static let buttonsTopSpacing: CGFloat = 20
+        static let buttonsHeight: CGFloat = 60
+    }
+    
+    private enum TrackerSection: Int, CaseIterable {
+        case emoji, color
+    }
+
     // MARK: - Properties
 
     var presenter: NewTrackerPresenterProtocol?
@@ -31,14 +55,14 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     // MARK: - Private Properties
 
     private let settingsItems = ["Категория", "Расписание"]
-    
+
     private let scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.translatesAutoresizingMaskIntoConstraints = false
         scroll.showsVerticalScrollIndicator = true
         return scroll
     }()
-    
+
     private let contentView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -148,11 +172,32 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         return stackView
     }()
 
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
+
+//    private lazy var colorCollectionView: UICollectionView = {
+//        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+//        collectionView.translatesAutoresizingMaskIntoConstraints = false
+//        return collectionView
+//    }()
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+
+        collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: EmojiCollectionViewCell.reuseIdentifier)
+        collectionView.register(ColorCollectionViewCell.self, forCellWithReuseIdentifier: ColorCollectionViewCell.reuseIdentifier)
+        collectionView.register(NewTrackerSectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: NewTrackerSectionHeaderView.reuseIdentifier)
+        collectionView.delegate = self
+
+//        colorCollectionView.register(ColorCollectionViewCell.self, forCellWithReuseIdentifier: ColorCollectionViewCell.reuseIdentifier)
+//        colorCollectionView.register(NewTrackerSectionHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: NewTrackerSectionHeaderView.reuseIdentifier)
+//        colorCollectionView.delegate = self
     }
 
     // MARK: - Methods
@@ -180,46 +225,60 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     private func setupUI() {
         view.backgroundColor = UIColor(resource: .white)
         view.addSubview(scrollView)
-    
+
         scrollView.addSubview(contentView)
-        
+
         contentView.addSubview(titleTextLabel)
         contentView.addSubview(nameFieldStackView)
         contentView.addSubview(tableView)
+        contentView.addSubview(collectionView)
         contentView.addSubview(buttonsStackView)
+
+        collectionView.isScrollEnabled = false
+        collectionView.allowsMultipleSelection = true
+        collectionView.dataSource = self
+        
+        let sectionHeight = Constants.emojiCellHeight * Constants.emojiRowsCount
+                          + Constants.emojiLineSpacing * (Constants.emojiRowsCount - 1)
+                          + Constants.collectionHeaderHeight
 
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
+
             contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-            
-            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            
-            titleTextLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            titleTextLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 27),
 
-            nameFieldStackView.topAnchor.constraint(equalTo: titleTextLabel.bottomAnchor, constant: 27),
-            nameFieldStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            nameFieldStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            nameTextField.heightAnchor.constraint(equalToConstant: 75),
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+
+            titleTextLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            titleTextLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: Constants.sectionSpacing),
+
+            nameFieldStackView.topAnchor.constraint(equalTo: titleTextLabel.bottomAnchor, constant: Constants.sectionSpacing),
+            nameFieldStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
+            nameFieldStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
+            nameTextField.heightAnchor.constraint(equalToConstant: Constants.nameFieldHeight),
 
             tableView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            tableView.topAnchor.constraint(equalTo: nameFieldStackView.bottomAnchor, constant: 27),
-            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            tableView.heightAnchor.constraint(equalToConstant: 150),
+            tableView.topAnchor.constraint(equalTo: nameFieldStackView.bottomAnchor, constant: Constants.sectionSpacing),
+            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
+            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
+            tableView.heightAnchor.constraint(equalToConstant: Constants.tableHeight),
 
-            buttonsStackView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 20),
-            buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            collectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: Constants.sectionSpacing),
+            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            collectionView.heightAnchor.constraint(equalToConstant: sectionHeight * 2),
+
+            buttonsStackView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: Constants.buttonsTopSpacing),
+            buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.buttonsSideInset),
+            buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.buttonsSideInset),
             buttonsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            buttonsStackView.heightAnchor.constraint(equalToConstant: 60)
+            buttonsStackView.heightAnchor.constraint(equalToConstant: Constants.buttonsHeight)
         ])
     }
 
@@ -312,5 +371,112 @@ extension NewTrackerViewController: UITableViewDataSource {
 extension NewTrackerViewController: ScheduleViewControllerDelegate {
     func didConfirmSchedule(_ schedule: [WeekDay]) {
         presenter?.didSelectSchedule(schedule)
+    }
+}
+
+// MARK: - UICollectionViewDataSource
+
+extension NewTrackerViewController: UICollectionViewDataSource {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        TrackerSection.allCases.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        switch TrackerSection(rawValue: section) {
+            case .emoji: return presenter?.emojisCount ?? 0
+            case .color: return presenter?.colorsCount ?? 0
+            case .none: return 0
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        switch TrackerSection(rawValue: indexPath.section) {
+            case .emoji: return configureEmojiCell(for: indexPath)
+            case .color: return configureColorCell(for: indexPath)
+            case .none:  return UICollectionViewCell()
+        }
+    }
+
+    private func configureEmojiCell(for indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmojiCollectionViewCell.reuseIdentifier, for: indexPath)
+        guard let emojiCell = cell as? EmojiCollectionViewCell,
+              let emoji = presenter?.emoji(at: indexPath.row) else {
+            return UICollectionViewCell()
+        }
+        emojiCell.configure(with: emoji)
+        return emojiCell
+    }
+
+    private func configureColorCell(for indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColorCollectionViewCell.reuseIdentifier, for: indexPath)
+        guard let colorCell = cell as? ColorCollectionViewCell,
+              let color = presenter?.colorName(at: indexPath.row) else {
+            return UICollectionViewCell()
+        }
+        colorCell.configure(with: color)
+        return colorCell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        var id: String
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            id = NewTrackerSectionHeaderView.reuseIdentifier
+        default:
+            id = ""
+        }
+
+        let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as! NewTrackerSectionHeaderView
+        switch TrackerSection(rawValue: indexPath.section) {
+        case .emoji: view.configure(title: presenter?.emojiSectionTitle ?? "")
+        case .color: view.configure(title: presenter?.colorSectionTitle ?? "")
+        case .none:  view.configure(title: "")
+        }
+        return view
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+
+extension NewTrackerViewController: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.indexPathsForSelectedItems?
+                .filter { $0.section == indexPath.section && $0 != indexPath }
+                .forEach { collectionView.deselectItem(at: $0, animated: false)}
+        switch TrackerSection(rawValue: indexPath.section) {
+        case .emoji: presenter?.didSelectEmoji(at: indexPath.row)
+        case .color: presenter?.didSelectColor(at: indexPath.row)
+        case .none: return
+        }
+    }
+}
+
+// MARK: - UICollectionViewDelegateFlowLayout
+
+extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        CGSize(width: collectionView.frame.width, height: Constants.collectionHeaderHeight)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let availableWidth = collectionView.bounds.width
+            - Constants.emojiSectionInset * 2
+            - Constants.emojiInterItemSpacing * (Constants.emojiItemsPerRow - 1)
+        let cellWidth = availableWidth / Constants.emojiItemsPerRow
+        return CGSize(width: cellWidth, height: Constants.emojiCellHeight)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        Constants.emojiInterItemSpacing
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        Constants.emojiLineSpacing
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        UIEdgeInsets(top: 0, left: Constants.emojiSectionInset, bottom: 0, right: Constants.emojiSectionInset)
     }
 }
