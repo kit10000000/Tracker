@@ -58,6 +58,13 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     private let colors = (1...18).map { "Color selection \($0)" }
     private let emojiTitle = "Emoji"
     private let colorTitle = "Цвет"
+    private var trackerStore: TrackerStore
+
+    // MARK: - Initializers
+
+    init(trackerStore: TrackerStore = TrackerStore()) {
+        self.trackerStore = trackerStore
+    }
 
     // MARK: - Methods
 
@@ -108,7 +115,7 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
         if !validateNewTrackerForm() { return }
 
         let newTracker = Tracker(id: UUID(), title: self.name, color: selectedColor, emoji: selectedEmoji, schedule: self.schedule)
-        TrackerCategoryStorage.shared.addTracker(newTracker, toCategory: self.selectedCategory)
+        self.trackerStore.addTracker(newTracker, toCategory: self.selectedCategory)
     }
 
     // MARK: - Private Methods

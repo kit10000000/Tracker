@@ -37,12 +37,22 @@ final class TrackersPresenter: TrackersPresenterProtocol {
 
     // MARK: - Private Properties
 
-    private var categories: [TrackerCategory] { TrackerCategoryStorage.shared.categories }
-    private var completedTrackers: [TrackerRecord] { TrackerRecordStorage.shared.completedTrackers }
+    private var categories: [TrackerCategory] { categoryStore.categories() }
+    private var completedTrackers: [TrackerRecord] { recordStore.records() }
     private var visibleCategories: [TrackerCategory] = []
     private var completedIds: Set<UUID> = []
     private var currentDate = Date()
     private var searchQuery = ""
+    private let categoryStore: TrackerCategoryStore
+    private let recordStore: TrackerRecordStore
+
+    // MARK: - Initializers
+
+    init(categoryStore: TrackerCategoryStore = TrackerCategoryStore(),
+         recordStore: TrackerRecordStore = TrackerRecordStore()) {
+        self.categoryStore = categoryStore
+        self.recordStore = recordStore
+    }
 
     // MARK: - Methods
 
@@ -74,7 +84,7 @@ final class TrackersPresenter: TrackersPresenterProtocol {
     func didTapComplete(at section: Int, _ index: Int) {
         guard Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) != .orderedDescending else { return }
         let tracker = visibleCategories[section].trackers[index]
-        TrackerRecordStorage.shared.toggleRecord(for: tracker.id, on: currentDate)
+        recordStore.toggleRecord(for: tracker.id, on: currentDate)
         updateCompletedIds()
         view?.reloadTrackers()
     }
