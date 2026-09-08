@@ -33,15 +33,4 @@ final class CoreDataStack {
     // MARK: - Initializers
 
     private init() {}
-
-    // MARK: - Methods
-
-    func save() {
-        guard persistentContainer.viewContext.hasChanges else { return }
-        do {
-            try persistentContainer.viewContext.save()
-        } catch {
-            fatalError("Failed to save the context: \(error.localizedDescription)")
-        }
-    }
 }

@@ -8,59 +8,79 @@
 import Foundation
 import CoreData
 
-enum TrackerCategoryStoreError: Error {
-    case decodingErrorInvalidTitle
+protocol TrackerCategoryStoreDelegate: AnyObject {
+    func didUpdate()
 }
 
-final class TrackerCategoryStore {
+final class TrackerCategoryStore: NSObject {
+
+    // MARK: - Properties
+
+    weak var delegate: TrackerCategoryStoreDelegate?
 
     // MARK: - Private Properties
 
     private let context: NSManagedObjectContext
+    private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>!
 
     // MARK: - Initializers
 
     init(context: NSManagedObjectContext = CoreDataStack.shared.context) {
         self.context = context
+        super.init()
+
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCoreData.title, ascending: false)]
+
+        let controller = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        controller.delegate = self
+        self.fetchedResultsController = controller
+        try? controller.performFetch()
     }
 
     // MARK: - Methods
 
-    func addCategory(title: String) {
-        let newCategory = TrackerCategoryCoreData(context: self.context)
-        newCategory.title = title
-        try? self.context.save()
-    }
-
     func categories() -> [TrackerCategory] {
-        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-        let result = (try? context.fetch(request)) ?? []
-        return result.compactMap { try? self.trackerCategory(from: $0) }
+        let trackers = fetchedResultsController.fetchedObjects ?? []
+        let grouped = Dictionary(grouping: trackers) { $0.category?.title ?? "" }
+        return grouped
+            .sorted { $0.key < $1.key }
+            .map { title, group in
+                let domainTrackers = group
+                    .sorted { ($0.title ?? "") < ($1.title ?? "") }
+                    .compactMap { try? $0.toDomain() }
+                return TrackerCategory(title: title, trackers: domainTrackers)
+            }
     }
 
     func titles() -> [String] {
-        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-        let result = (try? context.fetch(request)) ?? []
+        let request = TrackerCategoryCoreData.fetchRequest()
+        let result = context.fetchOrEmpty(request)
         return result.compactMap { $0.title }
     }
 
-    func trackerCategory(from coreData: TrackerCategoryCoreData) throws -> TrackerCategory {
-        guard let title = coreData.title else {
-            throw TrackerCategoryStoreError.decodingErrorInvalidTitle
-        }
-        let trackerCoreData = coreData.trackers?.allObjects as? [TrackerCoreData] ?? []
-        let trackers = try trackerCoreData.map { try TrackerStore.tracker(from: $0) }
-        return TrackerCategory(title: title, trackers: trackers)
-    }
-
     func categoryCoreData(forTitle: String) -> TrackerCategoryCoreData {
-        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-        request.predicate = NSPredicate(format: "title == %@", forTitle)
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.title), forTitle)
 
-        if let found = try? context.fetch(request).first { return found }
+        if let found = context.fetchOrEmpty(request).first { return found }
 
         let category = TrackerCategoryCoreData(context: self.context)
         category.title = forTitle
         return category
+    }
+}
+
+// MARK: - NSFetchedResultsControllerDelegate
+
+extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
+
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.didUpdate()
     }
 }

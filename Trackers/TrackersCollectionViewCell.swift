@@ -101,9 +101,8 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     // MARK: - Methods
 
     func configure(with tracker: TrackerViewModel) {
-        let color = UIColor(named: tracker.color) ?? .systemGreen
-        cardView.backgroundColor = color
-        completeButton.backgroundColor = color
+        cardView.backgroundColor = tracker.color
+        completeButton.backgroundColor = tracker.color
         emojiLabel.text = tracker.emoji
         titleLabel.text = tracker.title
         daysLabel.text = daysText(tracker.count)

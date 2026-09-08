@@ -9,11 +9,6 @@ import Foundation
 import CoreData
 
 enum TrackerStoreError: Error {
-    case decodingErrorInvalidId
-    case decodingErrorInvalidTitle
-    case decodingErrorInvalidEmoji
-    case decodingErrorInvalidColor
-    case decodingErrorInvalidSchedule
     case trackerDoesntExist
 }
 
@@ -41,32 +36,13 @@ final class TrackerStore {
         newTracker.schedule = tracker.schedule as NSObject?
         newTracker.category = categoryStore.categoryCoreData(forTitle: title)
         newTracker.id = tracker.id
-        try? self.context.save()
+        self.context.saveChanges()
     }
 
     func trackerCoreData(forId id: UUID) throws -> TrackerCoreData {
-        let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
-        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-        guard let found = try? context.fetch(request).first else { throw TrackerStoreError.trackerDoesntExist }
+        let request = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "%K == %@", "id", id as CVarArg)
+        guard let found = context.fetchOrEmpty(request).first else { throw TrackerStoreError.trackerDoesntExist }
         return found
-    }
-
-    static func tracker(from coreData: TrackerCoreData) throws -> Tracker {
-        guard let id = coreData.id else {
-            throw TrackerStoreError.decodingErrorInvalidId
-        }
-        guard let title = coreData.title else {
-            throw TrackerStoreError.decodingErrorInvalidTitle
-        }
-        guard let emoji = coreData.emoji else {
-            throw TrackerStoreError.decodingErrorInvalidEmoji
-        }
-        guard let color = coreData.color else {
-            throw TrackerStoreError.decodingErrorInvalidColor
-        }
-        guard let schedule = coreData.schedule else {
-            throw TrackerStoreError.decodingErrorInvalidSchedule
-        }
-        return Tracker(id: id, title: title, color: color, emoji: emoji, schedule: schedule as? [WeekDay] ?? [])
     }
 }

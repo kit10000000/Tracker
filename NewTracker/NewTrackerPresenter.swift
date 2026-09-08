@@ -22,6 +22,7 @@ protocol NewTrackerPresenterProtocol: AnyObject {
     func didSelectColor(at index: Int)
     func didSelectEmoji(at index: Int)
     func didTapCreate()
+    func isWithinNameLengthLimit(_ text: String) -> Bool
 }
 
 final class NewTrackerPresenter: NewTrackerPresenterProtocol {
@@ -46,6 +47,7 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     // MARK: - Private Properties
 
     private var name = ""
+    private let nameMaxLength = 38
     private var schedule: [WeekDay] = []
     private var selectedCategory = "Важное"
     private var selectedEmoji = ""
@@ -111,11 +113,16 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
         }
     }
 
+    func isWithinNameLengthLimit(_ text: String) -> Bool {
+        text.count <= nameMaxLength
+    }
+
     func didTapCreate() {
         if !validateNewTrackerForm() { return }
 
         let newTracker = Tracker(id: UUID(), title: self.name, color: selectedColor, emoji: selectedEmoji, schedule: self.schedule)
         self.trackerStore.addTracker(newTracker, toCategory: self.selectedCategory)
+        view?.dismissForm()
     }
 
     // MARK: - Private Methods

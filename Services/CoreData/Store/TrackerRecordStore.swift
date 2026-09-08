@@ -8,11 +8,6 @@
 import Foundation
 import CoreData
 
-enum TrackerRecordStoreError: Error {
-    case decodingErrorInvalidTrackerId
-    case decodingErrorInvalidDate
-}
-
 final class TrackerRecordStore {
 
     // MARK: - Private Properties
@@ -30,34 +25,24 @@ final class TrackerRecordStore {
     // MARK: - Methods
 
     func records() -> [TrackerRecord] {
-        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
-        let result = (try? context.fetch(request)) ?? []
-        return result.compactMap { try? self.trackerRecord(from: $0) }
-    }
-
-    func trackerRecord(from coreData: TrackerRecordCoreData) throws -> TrackerRecord {
-        guard let trackerId = coreData.tracker?.id else {
-            throw TrackerRecordStoreError.decodingErrorInvalidTrackerId
-        }
-        guard let date = coreData.date else {
-            throw TrackerRecordStoreError.decodingErrorInvalidDate
-        }
-        return TrackerRecord(trackerId: trackerId, date: date)
+        let request = TrackerRecordCoreData.fetchRequest()
+        let result = context.fetchOrEmpty(request)
+        return result.compactMap { try? $0.toDomain() }
     }
 
     func toggleRecord(for trackerId: UUID, on date: Date) {
         let startOfDay = Calendar.current.startOfDay(for: date)
         guard let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay) else { return }
 
-        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
+        let request = TrackerRecordCoreData.fetchRequest()
         request.predicate = NSPredicate(
-            format: "tracker.id == %@ AND date >= %@ AND date < %@",
-            trackerId as CVarArg,
-            startOfDay as NSDate,
-            nextDay as NSDate
+            format: "%K == %@ AND %K >= %@ AND %K < %@",
+            "tracker.id", trackerId as CVarArg,
+            #keyPath(TrackerRecordCoreData.date), startOfDay as NSDate,
+            #keyPath(TrackerRecordCoreData.date), nextDay as NSDate
         )
 
-        if let found = try? context.fetch(request).first {
+        if let found = context.fetchOrEmpty(request).first {
             context.delete(found)
         } else {
             guard let tracker = try? trackerStore.trackerCoreData(forId: trackerId) else { return }
@@ -66,6 +51,6 @@ final class TrackerRecordStore {
             newRecord.tracker = tracker
         }
 
-        try? self.context.save()
+        self.context.saveChanges()
     }
 }

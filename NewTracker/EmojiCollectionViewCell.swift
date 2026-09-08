@@ -13,6 +13,11 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
 
     static let reuseIdentifier = "EmojiCollectionViewCell"
 
+    private enum Constants {
+        static let emojiFontSize: CGFloat = 32
+        static let backgroundCornerRadius: CGFloat = 16
+    }
+
     // MARK: - Properties
 
     override var isSelected: Bool {
@@ -25,7 +30,7 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
 
     private lazy var emojiLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 32)
+        label.font = .systemFont(ofSize: Constants.emojiFontSize)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -33,7 +38,7 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
     private lazy var emojiBackgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
-        view.layer.cornerRadius = 16
+        view.layer.cornerRadius = Constants.backgroundCornerRadius
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()

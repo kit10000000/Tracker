@@ -7,14 +7,11 @@
 
 import UIKit
 
-protocol NewTrackerViewControllerDelegate: AnyObject {
-    func didCreateTracker()
-}
-
 protocol NewTrackerViewControllerProtocol: AnyObject {
     var presenter: NewTrackerPresenterProtocol? { get set }
     func setCreateButtonEnabled(_ isEnabled: Bool)
     func updateTable(at row: Int)
+    func dismissForm()
 }
 
 final class NewTrackerViewController: UIViewController, NewTrackerViewControllerProtocol {
@@ -30,12 +27,12 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         static let nameFieldHeight: CGFloat = 75
         static let tableHeight: CGFloat = 150
 
-        static let emojiItemsPerRow: CGFloat = 6
-        static let emojiCellHeight: CGFloat = 52
-        static let emojiSectionInset: CGFloat = 8
-        static let emojiInterItemSpacing: CGFloat = 2
-        static let emojiLineSpacing: CGFloat = 7
-        static let emojiRowsCount: CGFloat = 3
+        static let itemsPerRow: CGFloat = 6
+        static let cellHeight: CGFloat = 52
+        static let sectionInset: CGFloat = 8
+        static let interItemSpacing: CGFloat = 2
+        static let lineSpacing: CGFloat = 7
+        static let rowsPerSection: CGFloat = 3
         static let collectionHeaderHeight: CGFloat = 46
 
         static let buttonsSideInset: CGFloat = 20
@@ -50,7 +47,6 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     // MARK: - Properties
 
     var presenter: NewTrackerPresenterProtocol?
-    weak var delegate: NewTrackerViewControllerDelegate?
 
     // MARK: - Private Properties
 
@@ -210,6 +206,10 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         tableView.reloadRows(at: [IndexPath(row: row, section: 0)], with: .none)
     }
 
+    func dismissForm() {
+        dismiss(animated: true)
+    }
+
     // MARK: - Private Methods
 
     private func setupUI() {
@@ -228,8 +228,8 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         collectionView.allowsMultipleSelection = true
         collectionView.dataSource = self
 
-        let sectionHeight = Constants.emojiCellHeight * Constants.emojiRowsCount
-                          + Constants.emojiLineSpacing * (Constants.emojiRowsCount - 1)
+        let sectionHeight = Constants.cellHeight * Constants.rowsPerSection
+                          + Constants.lineSpacing * (Constants.rowsPerSection - 1)
                           + Constants.collectionHeaderHeight
 
         NSLayoutConstraint.activate([
@@ -278,8 +278,6 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private func didTapCreate() {
         presenter?.didTapCreate()
-        delegate?.didCreateTracker()
-        dismiss(animated: true)
     }
 
     private func didTapCancel() {
@@ -300,10 +298,9 @@ extension NewTrackerViewController: UITextFieldDelegate {
         guard let textRange = Range(range, in: currentText) else { return true }
         let updatedText = currentText.replacingCharacters(in: textRange, with: string)
 
-        let isShorter = updatedText.count <= 38
-        lengthWarningLabel.isHidden = isShorter
-
-        return isShorter
+        let isWithinLimit = presenter?.isWithinNameLengthLimit(updatedText) ?? true
+        lengthWarningLabel.isHidden = isWithinLimit
+        return isWithinLimit
     }
 
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
@@ -409,15 +406,15 @@ extension NewTrackerViewController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        var id: String
-        switch kind {
-        case UICollectionView.elementKindSectionHeader:
-            id = NewTrackerSectionHeaderView.reuseIdentifier
-        default:
-            id = ""
-        }
 
-        let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as! NewTrackerSectionHeaderView
+        guard kind == UICollectionView.elementKindSectionHeader,
+            let view = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: NewTrackerSectionHeaderView.reuseIdentifier,
+            for: indexPath
+        ) as? NewTrackerSectionHeaderView else {
+            return UICollectionReusableView()
+        }
         switch TrackerSection(rawValue: indexPath.section) {
         case .emoji: view.configure(title: presenter?.emojiSectionTitle ?? "")
         case .color: view.configure(title: presenter?.colorSectionTitle ?? "")
@@ -452,21 +449,21 @@ extension NewTrackerViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let availableWidth = collectionView.bounds.width
-            - Constants.emojiSectionInset * 2
-            - Constants.emojiInterItemSpacing * (Constants.emojiItemsPerRow - 1)
-        let cellWidth = availableWidth / Constants.emojiItemsPerRow
-        return CGSize(width: cellWidth, height: Constants.emojiCellHeight)
+            - Constants.sectionInset * 2
+            - Constants.interItemSpacing * (Constants.itemsPerRow - 1)
+        let cellWidth = availableWidth / Constants.itemsPerRow
+        return CGSize(width: cellWidth, height: Constants.cellHeight)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        Constants.emojiInterItemSpacing
+        Constants.interItemSpacing
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        Constants.emojiLineSpacing
+        Constants.lineSpacing
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: 0, left: Constants.emojiSectionInset, bottom: 0, right: Constants.emojiSectionInset)
+        UIEdgeInsets(top: 0, left: Constants.sectionInset, bottom: 0, right: Constants.sectionInset)
     }
 }

@@ -10,6 +10,11 @@ import Foundation
 enum WeekDay: Int, CaseIterable, Codable {
     case monday = 1, tuesday, wednesday, thursday, friday, saturday, sunday
 
+    init?(date: Date, calendar: Calendar = .current) {
+        let systemWeekday = calendar.component(.weekday, from: date)
+        self.init(rawValue: systemWeekday == 1 ? 7 : systemWeekday - 1)
+    }
+
     var shortName: String {
         switch self {
         case .monday: return "Пн"

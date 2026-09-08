@@ -13,13 +13,22 @@ final class ColorCollectionViewCell: UICollectionViewCell {
 
     static let reuseIdentifier = "ColorCollectionViewCell"
 
+    private enum Constants {
+        static let selectedBorderWidth: CGFloat = 3
+        static let selectedBorderAlpha: CGFloat = 0.3
+        static let cornerRadius: CGFloat = 11
+        static let colorViewCornerRadius: CGFloat = 8
+        static let colorViewVerticalInset: CGFloat = 6
+        static let colorViewHorizontalInset: CGFloat = 7
+    }
+
     // MARK: - Properties
 
     override var isSelected: Bool {
         didSet {
-            contentView.layer.borderWidth = isSelected ? 3 : 0
+            contentView.layer.borderWidth = isSelected ? Constants.selectedBorderWidth : 0
             contentView.layer.borderColor = isSelected
-                ? colorView.backgroundColor?.withAlphaComponent(0.3).cgColor
+                ? colorView.backgroundColor?.withAlphaComponent(Constants.selectedBorderAlpha).cgColor
                 : UIColor.clear.cgColor
         }
     }
@@ -28,7 +37,7 @@ final class ColorCollectionViewCell: UICollectionViewCell {
 
     private lazy var colorView: UIView = {
         let view = UIView()
-        view.layer.cornerRadius = 8
+        view.layer.cornerRadius = Constants.colorViewCornerRadius
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -55,15 +64,15 @@ final class ColorCollectionViewCell: UICollectionViewCell {
 
     private func setupUI() {
         contentView.addSubview(colorView)
-        contentView.layer.cornerRadius = 11
+        contentView.layer.cornerRadius = Constants.cornerRadius
     }
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            colorView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 6),
-            colorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 7),
-            colorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -7),
-            colorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -6),
+            colorView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.colorViewVerticalInset),
+            colorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.colorViewHorizontalInset),
+            colorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.colorViewHorizontalInset),
+            colorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Constants.colorViewVerticalInset),
         ])
     }
 }

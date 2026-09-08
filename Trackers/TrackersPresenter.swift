@@ -5,7 +5,7 @@
 //  Created by Ekaterina on 05.08.2026.
 //
 
-import Foundation
+import UIKit
 
 protocol TrackersPresenterProtocol: AnyObject {
     var view: TrackersViewControllerProtocol? { get set }
@@ -18,10 +18,9 @@ protocol TrackersPresenterProtocol: AnyObject {
     func didSelectDate(_ date: Date)
     func didChangeSearchText(_ query: String)
     func didTapComplete(at section: Int, _ index: Int)
-    func didAddTracker()
 }
 
-final class TrackersPresenter: TrackersPresenterProtocol {
+final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDelegate {
 
     // MARK: - Properties
 
@@ -46,6 +45,10 @@ final class TrackersPresenter: TrackersPresenterProtocol {
     private let categoryStore: TrackerCategoryStore
     private let recordStore: TrackerRecordStore
 
+    private var isFutureDate: Bool {
+        Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) == .orderedDescending
+    }
+
     // MARK: - Initializers
 
     init(categoryStore: TrackerCategoryStore = TrackerCategoryStore(),
@@ -57,6 +60,11 @@ final class TrackersPresenter: TrackersPresenterProtocol {
     // MARK: - Methods
 
     func viewDidLoad() {
+        updateView()
+        self.categoryStore.delegate = self
+    }
+
+    func didUpdate() {
         updateView()
     }
 
@@ -70,19 +78,20 @@ final class TrackersPresenter: TrackersPresenterProtocol {
 
     func tracker(at section: Int, _ index: Int) -> TrackerViewModel {
         let tracker = visibleCategories[section].trackers[index]
-        let isFuture = Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) == .orderedDescending
+        let color = UIColor(named: tracker.color)
+        assert(color != nil, "неизвестный ассет цвета: \(tracker.color)")
         return TrackerViewModel(
             title: tracker.title,
-            color: tracker.color,
+            color: color ?? .systemGreen,
             emoji: tracker.emoji,
             isCompleted: completedIds.contains(tracker.id),
-            isCompletionAllowed: !isFuture,
+            isCompletionAllowed: !isFutureDate,
             count: completedTrackers.count(where: { $0.trackerId == tracker.id })
         )
     }
 
     func didTapComplete(at section: Int, _ index: Int) {
-        guard Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) != .orderedDescending else { return }
+        guard !isFutureDate else { return }
         let tracker = visibleCategories[section].trackers[index]
         recordStore.toggleRecord(for: tracker.id, on: currentDate)
         updateCompletedIds()
@@ -96,10 +105,6 @@ final class TrackersPresenter: TrackersPresenterProtocol {
 
     func didChangeSearchText(_ query: String) {
         searchQuery = query
-        updateView()
-    }
-
-    func didAddTracker() {
         updateView()
     }
 
@@ -130,8 +135,7 @@ final class TrackersPresenter: TrackersPresenterProtocol {
 
     private func filterVisibleCategories() {
         visibleCategories = []
-        let systemWeekday = Calendar.current.component(.weekday, from: currentDate)
-        guard let weekDay = WeekDay(rawValue: systemWeekday == 1 ? 7 : systemWeekday - 1) else { return }
+        guard let weekDay = WeekDay(date: currentDate) else { return }
         for category in categories {
             let scheduled = category.trackers.filter { tracker in
                 tracker.schedule.contains(weekDay) &&

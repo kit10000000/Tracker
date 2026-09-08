@@ -17,6 +17,14 @@ final class ScheduleViewController: UIViewController {
 
     static let weekdayCellIdentifier = "weekdayCell"
 
+    private enum Constants {
+        static let sectionSpacing: CGFloat = 27
+        static let sideInset: CGFloat = 16
+        static let tableHeight: CGFloat = 525
+        static let buttonsSideInset: CGFloat = 20
+        static let buttonsHeight: CGFloat = 60
+    }
+
     // MARK: - Properties
 
     weak var delegate: ScheduleViewControllerDelegate?
@@ -86,18 +94,18 @@ final class ScheduleViewController: UIViewController {
 
         NSLayoutConstraint.activate([
             titleTextLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            titleTextLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 27),
+            titleTextLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.sectionSpacing),
 
             tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            tableView.topAnchor.constraint(equalTo: titleTextLabel.bottomAnchor, constant: 27),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            tableView.heightAnchor.constraint(equalToConstant: 525),
+            tableView.topAnchor.constraint(equalTo: titleTextLabel.bottomAnchor, constant: Constants.sectionSpacing),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.sideInset),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sideInset),
+            tableView.heightAnchor.constraint(equalToConstant: Constants.tableHeight),
 
-            readyButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            readyButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            readyButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.buttonsSideInset),
+            readyButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.buttonsSideInset),
             readyButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            readyButton.heightAnchor.constraint(equalToConstant: 60)
+            readyButton.heightAnchor.constraint(equalToConstant: Constants.buttonsHeight)
         ])
     }
 
