@@ -24,7 +24,7 @@ final class CoreDataStack {
         let container = NSPersistentContainer(name: "TrackerDB")
         container.loadPersistentStores { _, error in
             if let error {
-                fatalError("Failed to load persistent stores: \(error.localizedDescription)")
+                assertionFailure("Failed to load persistent stores: \(error.localizedDescription)")
             }
         }
         return container

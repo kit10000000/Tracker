@@ -20,18 +20,18 @@ enum CoreDataMappingError: Error {
 
 extension TrackerCoreData {
     func toDomain() throws -> Tracker {
-        guard let id = self.id else { throw CoreDataMappingError.missingId }
-        guard let title = self.title else { throw CoreDataMappingError.missingTitle }
-        guard let emoji = self.emoji else { throw CoreDataMappingError.missingEmoji }
-        guard let color = self.color else { throw CoreDataMappingError.missingColor }
-        guard let schedule = self.schedule else { throw CoreDataMappingError.missingSchedule }
+        guard let id else { throw CoreDataMappingError.missingId }
+        guard let title else { throw CoreDataMappingError.missingTitle }
+        guard let emoji else { throw CoreDataMappingError.missingEmoji }
+        guard let color else { throw CoreDataMappingError.missingColor }
+        guard let schedule else { throw CoreDataMappingError.missingSchedule }
         return Tracker(id: id, title: title, color: color, emoji: emoji, schedule: schedule as? [WeekDay] ?? [])
     }
 }
 
 extension TrackerCategoryCoreData {
     func toDomain() throws -> TrackerCategory {
-        guard let title = self.title else { throw CoreDataMappingError.missingTitle }
+        guard let title else { throw CoreDataMappingError.missingTitle }
         let trackers = try (trackers?.allObjects as? [TrackerCoreData] ?? [])
             .sorted { ($0.title ?? "") < ($1.title ?? "") }
             .map { try $0.toDomain() }
@@ -42,7 +42,7 @@ extension TrackerCategoryCoreData {
 extension TrackerRecordCoreData {
     func toDomain() throws -> TrackerRecord {
         guard let trackerId = tracker?.id else { throw CoreDataMappingError.missingTrackerId }
-        guard let date = self.date else { throw CoreDataMappingError.missingDate }
+        guard let date else { throw CoreDataMappingError.missingDate }
         return TrackerRecord(trackerId: trackerId, date: date)
     }
 }

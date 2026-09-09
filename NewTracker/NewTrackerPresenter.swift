@@ -34,11 +34,11 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     var currentSchedule: [WeekDay] { schedule }
 
     var emojisCount: Int {
-        emojis.count
+        TrackerOptions.emojis.count
     }
 
     var colorsCount: Int {
-        colors.count
+        TrackerOptions.colors.count
     }
 
     var emojiSectionTitle: String { emojiTitle }
@@ -52,12 +52,6 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     private var selectedCategory = "Важное"
     private var selectedEmoji = ""
     private var selectedColor = ""
-    private let emojis = [
-        "🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶",
-        "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"
-    ]
-
-    private let colors = (1...18).map { "Color selection \($0)" }
     private let emojiTitle = "Emoji"
     private let colorTitle = "Цвет"
     private var trackerStore: TrackerStore
@@ -82,21 +76,21 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     }
 
     func didSelectColor(at index: Int) {
-        selectedColor = colors[index]
+        selectedColor = TrackerOptions.colors[index]
         view?.setCreateButtonEnabled(validateNewTrackerForm())
     }
 
     func didSelectEmoji(at index: Int) {
-        selectedEmoji = emojis[index]
+        selectedEmoji = TrackerOptions.emojis[index]
         view?.setCreateButtonEnabled(validateNewTrackerForm())
     }
 
     func emoji(at index: Int) -> String {
-        emojis[index]
+        TrackerOptions.emojis[index]
     }
 
     func colorName(at index: Int) -> String {
-        colors[index]
+        TrackerOptions.colors[index]
     }
 
     func subtitle(for row: Int) -> String? {
