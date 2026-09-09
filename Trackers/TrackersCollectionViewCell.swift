@@ -94,16 +94,16 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         setupConstraints()
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        nil
     }
 
     // MARK: - Methods
 
     func configure(with tracker: TrackerViewModel) {
-        let color = UIColor(named: tracker.color) ?? .systemGreen
-        cardView.backgroundColor = color
-        completeButton.backgroundColor = color
+        cardView.backgroundColor = tracker.color
+        completeButton.backgroundColor = tracker.color
         emojiLabel.text = tracker.emoji
         titleLabel.text = tracker.title
         daysLabel.text = daysText(tracker.count)

@@ -6,11 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		7832253D3038DB5900E10A62 /* TrackerCategoryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7832253C3038DB5900E10A62 /* TrackerCategoryStorage.swift */; };
-		7832253F3038DDB500E10A62 /* TrackerRecordStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7832253E3038DDB500E10A62 /* TrackerRecordStorage.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		78D78B7D301FA2A400EC6EBF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,8 +24,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		7832253C3038DB5900E10A62 /* TrackerCategoryStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStorage.swift; sourceTree = "<group>"; };
-		7832253E3038DDB500E10A62 /* TrackerRecordStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordStorage.swift; sourceTree = "<group>"; };
 		78D78B66301FA2A300EC6EBF /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		78D78B7C301FA2A400EC6EBF /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		78D78B86301FA2A400EC6EBF /* TrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -114,6 +107,11 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		78CA1EE7304B00BA0093CF87 /* CoreData */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CoreData;
+			sourceTree = "<group>";
+		};
 		78D78B68301FA2A300EC6EBF /* Tracker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -166,8 +164,7 @@
 		7832253B3038DB4D00E10A62 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				7832253E3038DDB500E10A62 /* TrackerRecordStorage.swift */,
-				7832253C3038DB5900E10A62 /* TrackerCategoryStorage.swift */,
+				78CA1EE7304B00BA0093CF87 /* CoreData */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -219,6 +216,7 @@
 				783225343038B09400E10A62 /* Schedule */,
 				78AE21903023C4AA00047489 /* TabBar */,
 				78AE21983023C4B300047489 /* Models */,
+				78CA1EE7304B00BA0093CF87 /* CoreData */,
 				78D78B68301FA2A300EC6EBF /* Tracker */,
 			);
 			name = Tracker;
@@ -347,8 +345,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7832253D3038DB5900E10A62 /* TrackerCategoryStorage.swift in Sources */,
-				7832253F3038DDB500E10A62 /* TrackerRecordStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -190,7 +190,6 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     private func didTapAddTracker() {
         let newTrackerViewController = NewTrackerViewController()
         newTrackerViewController.configure(NewTrackerPresenter())
-        newTrackerViewController.delegate = self
         present(newTrackerViewController, animated: true)
     }
 
@@ -225,15 +224,15 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        var id: String
-        switch kind {
-        case UICollectionView.elementKindSectionHeader:
-            id = TrackerSectionHeaderView.reuseIdentifier
-        default:
-            id = ""
-        }
 
-        let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as! TrackerSectionHeaderView
+        guard kind == UICollectionView.elementKindSectionHeader,
+            let view = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: TrackerSectionHeaderView.reuseIdentifier,
+            for: indexPath
+        ) as? TrackerSectionHeaderView else {
+            return UICollectionReusableView()
+        }
         view.configure(title: presenter?.categoryTitle(at: indexPath.section) ?? "")
         return view
     }
@@ -277,13 +276,5 @@ extension TrackersViewController: TrackersCollectionViewCellDelegate {
     func trackerCollectionViewCellDidTapComplete(_ cell: TrackersCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         presenter?.didTapComplete(at: indexPath.section, indexPath.row)
-    }
-}
-
-// MARK: - NewTrackerViewControllerDelegate
-
-extension TrackersViewController: NewTrackerViewControllerDelegate {
-    func didCreateTracker() {
-        presenter?.didAddTracker()
     }
 }

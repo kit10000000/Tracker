@@ -1,17 +1,17 @@
 //
-//  TrackerSectionHeaderView.swift
+//  NewTrackerSectionHeaderView.swift
 //  Tracker
 //
-//  Created by Ekaterina on 17.08.2026.
+//  Created by Ekaterina on 04.09.2026.
 //
 
 import UIKit
 
-final class TrackerSectionHeaderView: UICollectionReusableView {
+final class NewTrackerSectionHeaderView: UICollectionReusableView {
 
     // MARK: - Constants
 
-    static let reuseIdentifier = "header"
+    static let reuseIdentifier = "newTrackerHeader"
 
     private enum Constants {
         static let leadingPadding: CGFloat = 28
