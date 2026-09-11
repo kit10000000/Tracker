@@ -76,6 +76,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		780D8FF23053FDB800DBB258 /* NewCategory */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = NewCategory;
+			sourceTree = "<group>";
+		};
 		783224BE3034F9C900E10A62 /* NewTracker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = NewTracker;
@@ -188,6 +193,7 @@
 		78D78B5D301FA2A300EC6EBF = {
 			isa = PBXGroup;
 			children = (
+				780D8FF23053FDB800DBB258 /* NewCategory */,
 				786A7041305301E300E6EA9E /* Category */,
 				788992CF3051E0D4006F8A4D /* Onboarding */,
 				7832253B3038DB4D00E10A62 /* Services */,
@@ -230,6 +236,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				780D8FF23053FDB800DBB258 /* NewCategory */,
 				783224BE3034F9C900E10A62 /* NewTracker */,
 				783225343038B09400E10A62 /* Schedule */,
 				786A7041305301E300E6EA9E /* Category */,

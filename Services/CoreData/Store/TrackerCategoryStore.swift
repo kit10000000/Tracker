@@ -60,7 +60,7 @@ final class TrackerCategoryStore: NSObject {
 
     func titles() -> [String] {
         let request = TrackerCategoryCoreData.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: true)]
         let result = context.fetchOrEmpty(request)
         return result.compactMap { $0.title }
     }

@@ -63,7 +63,7 @@ final class ScheduleViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
-        button.backgroundColor = UIColor(resource: .black)
+        button.backgroundColor = UIColor(resource: .blackDay)
         button.addAction(UIAction { [weak self] _ in
             self?.didTapReady()
         }, for: .touchUpInside)

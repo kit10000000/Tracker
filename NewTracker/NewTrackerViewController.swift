@@ -317,11 +317,13 @@ extension NewTrackerViewController: UITableViewDelegate {
         if indexPath.row == 0 {
             let viewModel = CategoryListViewModel(selectedCategory: presenter?.currentCategory)
             let categoryViewController = CategoryListViewController()
-            categoryViewController.initialize(viewModel: viewModel)   // внутри: bind + loadCategories
+            categoryViewController.initialize(viewModel: viewModel)
 
             viewModel.onCategorySelect = { [weak self] title in
-                self?.presenter?.didSelectCategory(title)   // передаём в презентер
-                self?.dismiss(animated: true)               // закрываем экран
+                self?.presenter?.didSelectCategory(title)
+                if !title.isEmpty {
+                    self?.dismiss(animated: true)
+                }
             }
 
             present(categoryViewController, animated: true)

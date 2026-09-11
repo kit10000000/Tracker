@@ -16,6 +16,10 @@ final class CategoryListViewController: UIViewController {
         static let sideInset: CGFloat = 16
         static let buttonsSideInset: CGFloat = 20
         static let buttonsHeight: CGFloat = 60
+        static let placeholderCenterYOffset: CGFloat = 36
+        static let placeholderSize: CGFloat = 80
+        static let placeholderTextSpacing: CGFloat = 8
+        static let placeholderSideInset: CGFloat = 70
     }
 
     // MARK: - Private Properties
@@ -53,9 +57,30 @@ final class CategoryListViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
-        button.backgroundColor = UIColor(resource: .black)
+        button.backgroundColor = UIColor(resource: .blackDay)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.addAction(UIAction { [weak self] _ in
+            self?.didTapCreate()
+        }, for: .touchUpInside)
         return button
+    }()
+
+    private lazy var starImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(resource: .star)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+
+    private lazy var textLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Привычки и события можно объединить по смыслу"
+        label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
+        label.textColor = .ypBlack
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        return label
     }()
 
     // MARK: - Lifecycle
@@ -82,6 +107,9 @@ final class CategoryListViewController: UIViewController {
             guard let self else { return }
             self.tableView.reloadData()
             self.tableHeightConstraint?.constant = CGFloat(categories.count) * self.tableView.rowHeight
+
+            self.starImageView.isHidden = !categories.isEmpty
+            self.textLabel.isHidden = !categories.isEmpty
         }
     }
 
@@ -90,10 +118,12 @@ final class CategoryListViewController: UIViewController {
         view.addSubview(titleTextLabel)
         view.addSubview(tableView)
         view.addSubview(createButton)
+        view.addSubview(textLabel)
+        view.addSubview(starImageView)
 
-        let rowCount = viewModel?.numberOfRows() ?? 0
-        let tableHeightConstraint = tableView.heightAnchor.constraint(equalToConstant: CGFloat(rowCount) * tableView.rowHeight)
-        self.tableHeightConstraint = tableHeightConstraint
+        starImageView.isHidden = !(viewModel?.numberOfRows() == 0)
+        textLabel.isHidden = !(viewModel?.numberOfRows() == 0)
+        tableView.isScrollEnabled = true
 
         NSLayoutConstraint.activate([
             titleTextLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -103,13 +133,36 @@ final class CategoryListViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: titleTextLabel.bottomAnchor, constant: Constants.sectionSpacing),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.sideInset),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sideInset),
-            tableHeightConstraint,
+            tableView.bottomAnchor.constraint(equalTo: createButton.topAnchor, constant: -Constants.sectionSpacing),
 
             createButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.buttonsSideInset),
             createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.buttonsSideInset),
             createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            createButton.heightAnchor.constraint(equalToConstant: Constants.buttonsHeight)
+            createButton.heightAnchor.constraint(equalToConstant: Constants.buttonsHeight),
+
+            starImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            starImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: Constants.placeholderCenterYOffset),
+            starImageView.widthAnchor.constraint(equalToConstant: Constants.placeholderSize),
+            starImageView.heightAnchor.constraint(equalToConstant: Constants.placeholderSize),
+
+            textLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            textLabel.topAnchor.constraint(equalTo: starImageView.bottomAnchor, constant: Constants.placeholderTextSpacing),
+            textLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.placeholderSideInset),
+            textLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.placeholderSideInset)
         ])
+    }
+
+    private func didTapCreate() {
+        let viewModel = NewCategoryViewModel()
+        let newCategoryViewController = NewCategoryViewController()
+        newCategoryViewController.initialize(viewModel: viewModel)
+
+        viewModel.onCategoryCreated = { [weak self] title in
+            self?.viewModel?.addCategory(title)
+            self?.dismiss(animated: true)
+        }
+
+        present(newCategoryViewController, animated: true)
     }
 }
 

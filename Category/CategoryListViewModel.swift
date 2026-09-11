@@ -48,9 +48,9 @@ final class CategoryListViewModel {
 
     func didSelectCategory(at index: Int) {
         let title = categories[index].title
-        selectedCategory = title
+        selectedCategory = (selectedCategory == title) ? nil : title
         loadCategories()
-        onCategorySelect?(title)
+        onCategorySelect?(selectedCategory ?? "")
     }
 
     func addCategory(_ title: String) {
