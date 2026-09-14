@@ -35,7 +35,7 @@ final class ScheduleViewController: UIViewController {
 
     private lazy var titleTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Расписание"
+        label.text = NSLocalizedString("schedule.title", comment: "Schedule screen title")
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -58,7 +58,7 @@ final class ScheduleViewController: UIViewController {
 
     private lazy var readyButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(NSLocalizedString("common.done", comment: "Done button title"), for: .normal)
         button.setTitleColor(UIColor(resource: .ypWhite), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16

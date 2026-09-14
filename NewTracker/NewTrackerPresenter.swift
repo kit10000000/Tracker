@@ -45,6 +45,7 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
 
     var emojiSectionTitle: String { emojiTitle }
     var colorSectionTitle: String { colorTitle }
+    var currentCategory: String { selectedCategory }
 
     // MARK: - Private Properties
 
@@ -52,11 +53,10 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     private let nameMaxLength = 38
     private var schedule: [WeekDay] = []
     private var selectedCategory = ""
-    var currentCategory: String { selectedCategory }
     private var selectedEmoji = ""
     private var selectedColor = ""
-    private let emojiTitle = "Emoji"
-    private let colorTitle = "Цвет"
+    private let emojiTitle = NSLocalizedString("newTracker.section.emoji", comment: "Emoji section header")
+    private let colorTitle = NSLocalizedString("newTracker.section.color", comment: "Color section header")
     private var trackerStore: TrackerStore
 
     // MARK: - Initializers
@@ -102,7 +102,7 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
         } else {
             guard !schedule.isEmpty else { return nil }
             if schedule.count == WeekDay.allCases.count {
-                return "Каждый день"
+                return NSLocalizedString("newTracker.schedule.everyDay", comment: "Schedule subtitle when every day is selected")
             } else {
                 let sorted = schedule.sorted { $0.rawValue < $1.rawValue }
                 return sorted.map { $0.shortName }.joined(separator: ", ")

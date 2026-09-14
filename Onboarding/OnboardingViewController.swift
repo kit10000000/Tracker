@@ -25,8 +25,8 @@ final class OnboardingViewController: UIPageViewController {
     // MARK: - Private Properties
 
     private lazy var pages: [UIViewController] = {
-        let blue = OnboardingPageContentViewController(image: UIImage(resource: .onboarding1), title: "Отслеживайте только то, что хотите")
-        let red = OnboardingPageContentViewController(image: UIImage(resource: .onboarding2), title: "Даже если это не литры воды и йога")
+        let blue = OnboardingPageContentViewController(image: UIImage(resource: .onboarding1), title: NSLocalizedString("onboarding.page1.title", comment: "Onboarding first page title"))
+        let red = OnboardingPageContentViewController(image: UIImage(resource: .onboarding2), title: NSLocalizedString("onboarding.page2.title", comment: "Onboarding second page title"))
         return [blue, red]
     }()
 
@@ -42,7 +42,7 @@ final class OnboardingViewController: UIPageViewController {
 
     private lazy var nextButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Вот это технологии!", for: .normal)
+        button.setTitle(NSLocalizedString("onboarding.button", comment: "Onboarding finish button"), for: .normal)
         button.setTitleColor(UIColor(resource: .ypWhite), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16

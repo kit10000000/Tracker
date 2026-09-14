@@ -29,7 +29,7 @@ final class CategoryListViewController: UIViewController {
 
     private lazy var titleTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Категория"
+        label.text = NSLocalizedString("category.title", comment: "Category screen title")
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -52,7 +52,7 @@ final class CategoryListViewController: UIViewController {
 
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Добавить Категорию", for: .normal)
+        button.setTitle(NSLocalizedString("category.add", comment: "Add category button title"), for: .normal)
         button.setTitleColor(UIColor(resource: .ypWhite), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
@@ -74,7 +74,7 @@ final class CategoryListViewController: UIViewController {
 
     private lazy var textLabel: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно объединить по смыслу"
+        label.text = NSLocalizedString("category.placeholder.empty", comment: "Empty categories placeholder")
         label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false

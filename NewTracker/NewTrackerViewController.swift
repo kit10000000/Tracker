@@ -50,7 +50,10 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     // MARK: - Private Properties
 
-    private let settingsItems = ["Категория", "Расписание"]
+    private let settingsItems = [
+        NSLocalizedString("category.title", comment: "Category settings row title"),
+        NSLocalizedString("schedule.title", comment: "Schedule settings row title")
+    ]
 
     private let scrollView: UIScrollView = {
         let scroll = UIScrollView()
@@ -67,7 +70,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var titleTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая привычка"
+        label.text = NSLocalizedString("newTracker.title", comment: "New habit screen title")
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -76,7 +79,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString("newTracker.namePlaceholder", comment: "Tracker name field placeholder")
         textField.font = UIFont.systemFont(ofSize: 17)
         textField.backgroundColor = UIColor(resource: .background)
         textField.layer.cornerRadius = 16
@@ -98,7 +101,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var lengthWarningLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("newTracker.nameLimit", comment: "Tracker name length limit warning")
         label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor(resource: .red)
         label.isHidden = true
@@ -129,7 +132,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("common.cancel", comment: "Cancel button title"), for: .normal)
         button.setTitleColor(UIColor(resource: .red), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
@@ -145,7 +148,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(NSLocalizedString("common.create", comment: "Create button title"), for: .normal)
         button.setTitleColor(UIColor(resource: .ypWhite), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16

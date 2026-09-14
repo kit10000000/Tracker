@@ -36,7 +36,7 @@ final class NewCategoryViewModel {
 
     func didTapDone() {
         if store.titles().contains(where: { $0.lowercased() == currentTitle.lowercased() }) {
-            onError?("Категория с таким названием уже существует")
+            onError?(NSLocalizedString("newCategory.error.duplicate", comment: "Duplicate category name error"))
             return
         }
         onCategoryCreated?(currentTitle)

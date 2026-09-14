@@ -57,7 +57,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
 
     private lazy var welcomeTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        label.text = NSLocalizedString("trackers.placeholder.empty", comment: "Empty trackers placeholder")
         label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -66,7 +66,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
 
     private lazy var searchTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ничего не найдено"
+        label.text = NSLocalizedString("trackers.placeholder.notFound", comment: "No search results placeholder")
         label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -77,7 +77,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let picker = UIDatePicker()
         picker.datePickerMode = .date
         picker.preferredDatePickerStyle = .compact
-        picker.locale = Locale(identifier: "ru_RU")
+        picker.locale = Locale.current
         picker.addAction(UIAction { [weak self] _ in
             self?.datePickerValueChanged()
         }, for: .valueChanged)
@@ -170,7 +170,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     }
 
     private func setupNavigationBar() {
-        title = "Трекеры"
+        title = NSLocalizedString("trackers.title", comment: "Trackers navigation title")
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             image: UIImage(resource: .plus),

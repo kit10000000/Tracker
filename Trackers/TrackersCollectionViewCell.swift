@@ -155,13 +155,10 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     }
 
     private func daysText(_ count: Int) -> String {
-        let rem100 = count % 100
-        if (11...14).contains(rem100) { return "\(count) дней" }
-        switch count % 10 {
-        case 1: return "\(count) день"
-        case 2...4: return "\(count) дня"
-        default: return "\(count) дней"
-        }
+        String.localizedStringWithFormat(
+            NSLocalizedString("trackers.daysCompleted", comment: "Number of days a tracker has been completed"),
+            count
+        )
     }
 
     private func onCompleteTapped() {
