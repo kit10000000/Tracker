@@ -314,6 +314,20 @@ extension NewTrackerViewController: UITextFieldDelegate {
 extension NewTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        if indexPath.row == 0 {
+            let viewModel = CategoryListViewModel(selectedCategory: presenter?.currentCategory)
+            let categoryViewController = CategoryListViewController()
+            categoryViewController.initialize(viewModel: viewModel)
+
+            viewModel.onCategorySelect = { [weak self] title in
+                self?.presenter?.didSelectCategory(title)
+                if !title.isEmpty {
+                    self?.dismiss(animated: true)
+                }
+            }
+
+            present(categoryViewController, animated: true)
+        }
         if indexPath.row == 1 {
             let scheduleViewController = ScheduleViewController()
             scheduleViewController.delegate = self
@@ -344,7 +358,7 @@ extension NewTrackerViewController: UITableViewDataSource {
         content.secondaryTextProperties.font = UIFont.systemFont(ofSize: 17)
         content.secondaryTextProperties.color = UIColor(resource: .gray)
         cell.contentConfiguration = content
-        cell.isUserInteractionEnabled = indexPath.row != 0
+        cell.isUserInteractionEnabled = true
         cell.backgroundColor = UIColor(resource: .background)
         cell.accessoryType = .disclosureIndicator
         if indexPath.row == settingsItems.count - 1 {

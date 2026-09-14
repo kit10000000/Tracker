@@ -14,6 +14,8 @@ protocol NewTrackerPresenterProtocol: AnyObject {
     var colorsCount: Int { get }
     var emojiSectionTitle: String { get }
     var colorSectionTitle: String { get }
+    var currentCategory: String { get }
+    func didSelectCategory(_ title: String)
     func emoji(at index: Int) -> String
     func colorName(at index: Int) -> String
     func didChangeName(_ name: String)
@@ -49,7 +51,8 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     private var name = ""
     private let nameMaxLength = 38
     private var schedule: [WeekDay] = []
-    private var selectedCategory = "Важное"
+    private var selectedCategory = ""
+    var currentCategory: String { selectedCategory }
     private var selectedEmoji = ""
     private var selectedColor = ""
     private let emojiTitle = "Emoji"
@@ -117,6 +120,12 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
         let newTracker = Tracker(id: UUID(), title: self.name, color: selectedColor, emoji: selectedEmoji, schedule: self.schedule)
         self.trackerStore.addTracker(newTracker, toCategory: self.selectedCategory)
         view?.dismissForm()
+    }
+
+    func didSelectCategory(_ title: String) {
+        selectedCategory = title
+        view?.setCreateButtonEnabled(validateNewTrackerForm())
+        view?.updateTable(at: 0)
     }
 
     // MARK: - Private Methods

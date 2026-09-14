@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		788992D53051EEE9006F8A4D /* OnboardingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788992D43051EEE9006F8A4D /* OnboardingStorage.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		78D78B7D301FA2A400EC6EBF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		788992D43051EEE9006F8A4D /* OnboardingStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStorage.swift; sourceTree = "<group>"; };
 		78D78B66301FA2A300EC6EBF /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		78D78B7C301FA2A400EC6EBF /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		78D78B86301FA2A400EC6EBF /* TrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -71,6 +76,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		780D8FF23053FDB800DBB258 /* NewCategory */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = NewCategory;
+			sourceTree = "<group>";
+		};
 		783224BE3034F9C900E10A62 /* NewTracker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = NewTracker;
@@ -79,6 +89,16 @@
 		783225343038B09400E10A62 /* Schedule */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Schedule;
+			sourceTree = "<group>";
+		};
+		786A7041305301E300E6EA9E /* Category */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Category;
+			sourceTree = "<group>";
+		};
+		788992CF3051E0D4006F8A4D /* Onboarding */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		78AE218E3023C4AA00047489 /* Statistics */ = {
@@ -165,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				78CA1EE7304B00BA0093CF87 /* CoreData */,
+				788992D43051EEE9006F8A4D /* OnboardingStorage.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -172,6 +193,9 @@
 		78D78B5D301FA2A300EC6EBF = {
 			isa = PBXGroup;
 			children = (
+				780D8FF23053FDB800DBB258 /* NewCategory */,
+				786A7041305301E300E6EA9E /* Category */,
+				788992CF3051E0D4006F8A4D /* Onboarding */,
 				7832253B3038DB4D00E10A62 /* Services */,
 				783225343038B09400E10A62 /* Schedule */,
 				783224BE3034F9C900E10A62 /* NewTracker */,
@@ -212,8 +236,11 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				780D8FF23053FDB800DBB258 /* NewCategory */,
 				783224BE3034F9C900E10A62 /* NewTracker */,
 				783225343038B09400E10A62 /* Schedule */,
+				786A7041305301E300E6EA9E /* Category */,
+				788992CF3051E0D4006F8A4D /* Onboarding */,
 				78AE21903023C4AA00047489 /* TabBar */,
 				78AE21983023C4B300047489 /* Models */,
 				78CA1EE7304B00BA0093CF87 /* CoreData */,
@@ -345,6 +372,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				788992D53051EEE9006F8A4D /* OnboardingStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
