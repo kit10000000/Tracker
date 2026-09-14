@@ -101,7 +101,7 @@ final class CategoryListViewController: UIViewController {
     // MARK: - Private Methods
 
     private func bind() {
-        guard let viewModel = viewModel else { return }
+        guard let viewModel else { return }
 
         viewModel.onCategoriesChange = { [weak self] categories in
             guard let self else { return }
@@ -121,8 +121,8 @@ final class CategoryListViewController: UIViewController {
         view.addSubview(textLabel)
         view.addSubview(starImageView)
 
-        starImageView.isHidden = !(viewModel?.numberOfRows() == 0)
-        textLabel.isHidden = !(viewModel?.numberOfRows() == 0)
+        starImageView.isHidden = !(viewModel?.numberOfRows == 0)
+        textLabel.isHidden = !(viewModel?.numberOfRows == 0)
         tableView.isScrollEnabled = true
 
         NSLayoutConstraint.activate([
@@ -178,7 +178,7 @@ extension CategoryListViewController: UITableViewDelegate {
 
 extension CategoryListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel?.numberOfRows() ?? 0
+        return viewModel?.numberOfRows ?? 0
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -189,7 +189,7 @@ extension CategoryListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         categoryListCell.configure(with: cellModel)
-        let lastIndex = (viewModel?.numberOfRows() ?? 0) - 1
+        let lastIndex = (viewModel?.numberOfRows ?? 0) - 1
         if indexPath.row == lastIndex {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
         } else {

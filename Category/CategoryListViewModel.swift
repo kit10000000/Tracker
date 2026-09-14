@@ -15,6 +15,7 @@ final class CategoryListViewModel {
 
     var onCategoriesChange: Binding<[CategoryCellModel]>?
     var onCategorySelect: Binding<String>?
+    var numberOfRows: Int { categories.count }
 
     // MARK: - Private Properties
 
@@ -41,8 +42,6 @@ final class CategoryListViewModel {
             CategoryCellModel(title: title, isSelected: title == selectedCategory)
         }
     }
-
-    func numberOfRows() -> Int { categories.count }
 
     func cell(at index: Int) -> CategoryCellModel { categories[index] }
 

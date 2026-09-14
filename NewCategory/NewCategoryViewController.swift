@@ -100,11 +100,7 @@ final class NewCategoryViewController: UIViewController {
 
     private func setCreateButtonEnabled(_ isEnabled: Bool) {
         readyButton.isEnabled = isEnabled
-        if isEnabled {
-            readyButton.backgroundColor = UIColor(resource: .ypBlack)
-        } else {
-            readyButton.backgroundColor = UIColor(resource: .gray)
-        }
+        readyButton.backgroundColor = UIColor(resource: isEnabled ? .ypBlack : .gray)
     }
 
     private func setupUI() {
