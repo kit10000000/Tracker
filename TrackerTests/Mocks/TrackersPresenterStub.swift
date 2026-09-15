@@ -64,4 +64,6 @@ final class TrackersPresenterStub: TrackersPresenterProtocol {
     func didChangeSearchText(_ query: String) {}
 
     func didTapComplete(at section: Int, _ index: Int) {}
+
+    func didTapDelete(at section: Int, _ index: Int) {}
 }

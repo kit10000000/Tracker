@@ -11,11 +11,15 @@
 "common.cancel" = "Отменить";
 "common.create" = "Создать";
 "common.ok" = "OK";
+"common.delete" = "Удалить";
+"common.edit" = "Редактировать";
 
 /* MARK: - Trackers */
 "trackers.title" = "Трекеры";
 "trackers.placeholder.empty" = "Что будем отслеживать?";
 "trackers.placeholder.notFound" = "Ничего не найдено";
+"tracker.delete.confirm" = "Вы уверены, что хотите удалить трекер?";
+"tracker.error.absent" = "Трекера не существует";
 
 /* MARK: - Statistics */
 "statistics.title" = "Статистика";

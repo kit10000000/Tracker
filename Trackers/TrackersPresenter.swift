@@ -18,6 +18,7 @@ protocol TrackersPresenterProtocol: AnyObject {
     func didSelectDate(_ date: Date)
     func didChangeSearchText(_ query: String)
     func didTapComplete(at section: Int, _ index: Int)
+    func didTapDelete(at section: Int, _ index: Int)
 }
 
 final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDelegate {
@@ -44,6 +45,7 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
     private var searchQuery = ""
     private let categoryStore: TrackerCategoryStore
     private let recordStore: TrackerRecordStore
+    private let trackerStore: TrackerStore
 
     private var isFutureDate: Bool {
         Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) == .orderedDescending
@@ -52,9 +54,10 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
     // MARK: - Initializers
 
     init(categoryStore: TrackerCategoryStore = TrackerCategoryStore(),
-         recordStore: TrackerRecordStore = TrackerRecordStore()) {
+         recordStore: TrackerRecordStore = TrackerRecordStore(), trackerStore: TrackerStore = TrackerStore()) {
         self.categoryStore = categoryStore
         self.recordStore = recordStore
+        self.trackerStore = trackerStore
     }
 
     // MARK: - Methods
@@ -96,6 +99,16 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
         recordStore.toggleRecord(for: tracker.id, on: currentDate)
         updateCompletedIds()
         view?.reloadTrackers()
+    }
+
+    func didTapDelete(at section: Int, _ index: Int) {
+        let tracker = visibleCategories[section].trackers[index]
+
+        do {
+            try trackerStore.deleteTracker(tracker.id)
+        } catch TrackerStoreError.trackerDoesntExist {
+            view?.showErrorAlert(NSLocalizedString("tracker.error.absent", comment: "Tracker doesn't exist error"))
+        } catch {}
     }
 
     func didSelectDate(_ date: Date) {

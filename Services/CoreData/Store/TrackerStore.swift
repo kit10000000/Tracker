@@ -39,6 +39,12 @@ final class TrackerStore {
         self.context.saveChanges()
     }
 
+    func deleteTracker(_ id: UUID) throws {
+        let found = try trackerCoreData(forId: id)
+        context.delete(found)
+        context.saveChanges()
+    }
+
     func trackerCoreData(forId id: UUID) throws -> TrackerCoreData {
         let request = TrackerCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "%K == %@", "id", id as CVarArg)

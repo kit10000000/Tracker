@@ -34,14 +34,16 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
 
     weak var delegate: TrackersCollectionViewCellDelegate?
 
-    // MARK: - Private Properties
+    // MARK: - Properties
 
-    private lazy var cardView: UIView = {
+    lazy var cardView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = Constants.cardCornerRadius
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+
+    // MARK: - Private Properties
 
     private lazy var emojiBackgroundView: UIView = {
         let view = UIView()

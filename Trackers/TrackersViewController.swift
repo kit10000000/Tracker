@@ -13,6 +13,7 @@ protocol TrackersViewControllerProtocol: AnyObject {
     func showSearchErrorScreen()
     func showTrackers()
     func reloadTrackers()
+    func showErrorAlert(_ message: String)
 }
 
 final class TrackersViewController: UIViewController, TrackersViewControllerProtocol {
@@ -132,6 +133,12 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         collectionView.reloadData()
     }
 
+    func showErrorAlert(_ message: String) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("common.ok", comment: "Alert OK button"), style: .default))
+        present(alert, animated: true)
+    }
+
     // MARK: - Private Methods
 
     private func setupUI() {
@@ -196,6 +203,15 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     private func datePickerValueChanged() {
         presenter?.didSelectDate(datePicker.date)
     }
+
+    private func showDeleteConfirmation(at indexPath: IndexPath) {
+        let alert = UIAlertController(title: nil, message: NSLocalizedString("tracker.delete.confirm", comment: "Confirm delete message"), preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("common.delete", comment: "Confirm delete"), style: .destructive) { [weak self] _ in
+            self?.presenter?.didTapDelete(at: indexPath.section, indexPath.row)
+        })
+        alert.addAction(UIAlertAction(title: NSLocalizedString("common.cancel", comment: "Cancel delete"), style: .cancel))
+        present(alert, animated: true)
+    }
 }
 
 // MARK: - UICollectionViewDataSource
@@ -259,6 +275,41 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                         layout collectionViewLayout: UICollectionViewLayout,
                         insetForSectionAt section: Int) -> UIEdgeInsets {
         UIEdgeInsets(top: 0, left: Constants.sideInset, bottom: 0, right: Constants.sideInset)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first else { return nil }
+
+        return UIContextMenuConfiguration(actionProvider: { _ in
+            UIMenu(children: [
+                UIAction(title: NSLocalizedString("common.edit", comment: "Edit tracker with context menu")) { _ in },
+                UIAction(title: NSLocalizedString("common.delete", comment: "Delete tracker with context menu"), attributes: .destructive) { [weak self] _ in
+                    self?.showDeleteConfirmation(at: indexPath)
+                },
+            ])
+        })
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfiguration configuration: UIContextMenuConfiguration,
+        highlightPreviewForItemAt indexPath: IndexPath
+    ) -> UITargetedPreview? {
+        guard let trackerCell = collectionView.cellForItem(at: indexPath) as? TrackersCollectionViewCell else {
+            return nil
+        }
+        return UITargetedPreview(view: trackerCell.cardView)
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfiguration configuration: UIContextMenuConfiguration,
+        dismissalPreviewForItemAt indexPath: IndexPath
+    ) -> UITargetedPreview? {
+        guard let trackerCell = collectionView.cellForItem(at: indexPath) as? TrackersCollectionViewCell else {
+            return nil
+        }
+        return UITargetedPreview(view: trackerCell.cardView)
     }
 }
 
