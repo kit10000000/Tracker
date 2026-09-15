@@ -178,7 +178,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
                 self?.didTapAddTracker()
             }
         )
-        navigationItem.leftBarButtonItem?.tintColor = UIColor(named: "YP Black")
+        navigationItem.leftBarButtonItem?.tintColor = UIColor(resource: .ypBlack)
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
         let searchController = UISearchController(searchResultsController: nil)
