@@ -13,6 +13,7 @@
 "common.ok" = "OK";
 "common.delete" = "Delete";
 "common.edit" = "Edit";
+"common.save" = "Save";
 
 /* MARK: - Trackers */
 "trackers.title" = "Trackers";
@@ -49,6 +50,8 @@
 "newTracker.section.emoji" = "Emoji";
 "newTracker.section.color" = "Color";
 "newTracker.schedule.everyDay" = "Every day";
+
+"editTracker.title" = "Edit habit";
 
 /* MARK: - Weekdays (full) */
 "weekday.monday" = "Monday";

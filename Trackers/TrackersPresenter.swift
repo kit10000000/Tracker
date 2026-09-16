@@ -19,6 +19,7 @@ protocol TrackersPresenterProtocol: AnyObject {
     func didChangeSearchText(_ query: String)
     func didTapComplete(at section: Int, _ index: Int)
     func didTapDelete(at section: Int, _ index: Int)
+    func trackerForEditing(at section: Int, _ index: Int) -> (tracker: Tracker, category: String, days: Int)
 }
 
 final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDelegate {
@@ -119,6 +120,13 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
     func didChangeSearchText(_ query: String) {
         searchQuery = query
         updateView()
+    }
+
+    func trackerForEditing(at section: Int, _ index: Int) -> (tracker: Tracker, category: String, days: Int) {
+        let tracker = visibleCategories[section].trackers[index]
+        let category = visibleCategories[section].title
+        let days = completedTrackers.count(where: { $0.trackerId == tracker.id })
+        return (tracker, category, days)
     }
 
     // MARK: - Private Methods

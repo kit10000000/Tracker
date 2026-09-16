@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol NewTrackerViewControllerProtocol: AnyObject {
+protocol NewTrackerViewControllerProtocol: AnyObject, ErrorAlertPresenting {
     var presenter: NewTrackerPresenterProtocol? { get set }
     func setCreateButtonEnabled(_ isEnabled: Bool)
     func updateTable(at row: Int)
@@ -70,7 +70,6 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var titleTextLabel: UILabel = {
         let label = UILabel()
-        label.text = NSLocalizedString("newTracker.title", comment: "New habit screen title")
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -108,10 +107,27 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         return label
     }()
 
+    private lazy var daysLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 32, weight: .bold)
+        label.textAlignment = .center
+        label.textColor = .ypBlack
+        label.isHidden = true
+        return label
+    }()
+
     private lazy var nameFieldStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [nameTextField, lengthWarningLabel])
         stackView.axis = .vertical
         stackView.spacing = 8
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+
+    private lazy var topStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [daysLabel, nameFieldStackView])
+        stackView.axis = .vertical
+        stackView.spacing = 24
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -222,7 +238,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         scrollView.addSubview(contentView)
 
         contentView.addSubview(titleTextLabel)
-        contentView.addSubview(nameFieldStackView)
+        contentView.addSubview(topStackView)
         contentView.addSubview(tableView)
         contentView.addSubview(collectionView)
         contentView.addSubview(buttonsStackView)
@@ -251,13 +267,13 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
             titleTextLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             titleTextLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: Constants.sectionSpacing),
 
-            nameFieldStackView.topAnchor.constraint(equalTo: titleTextLabel.bottomAnchor, constant: Constants.sectionSpacing),
-            nameFieldStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
-            nameFieldStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
+            topStackView.topAnchor.constraint(equalTo: titleTextLabel.bottomAnchor, constant: Constants.sectionSpacing),
+            topStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
+            topStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
             nameTextField.heightAnchor.constraint(equalToConstant: Constants.nameFieldHeight),
 
             tableView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            tableView.topAnchor.constraint(equalTo: nameFieldStackView.bottomAnchor, constant: Constants.sectionSpacing),
+            tableView.topAnchor.constraint(equalTo: topStackView.bottomAnchor, constant: Constants.sectionSpacing),
             tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
             tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
             tableView.heightAnchor.constraint(equalToConstant: Constants.tableHeight),
@@ -273,6 +289,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
             buttonsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             buttonsStackView.heightAnchor.constraint(equalToConstant: Constants.buttonsHeight)
         ])
+        prefill()
     }
 
     private func didChangeName() {
@@ -285,6 +302,28 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private func didTapCancel() {
         dismiss(animated: true)
+    }
+
+    private func prefill() {
+        guard let presenter else { return }
+
+        titleTextLabel.text = presenter.screenTitle
+        createButton.setTitle(presenter.buttonTitle, for: .normal)
+        nameTextField.text = presenter.currentName
+
+        daysLabel.isHidden = !presenter.isEditing
+        daysLabel.text = presenter.completedDaysText
+
+        tableView.reloadData()
+        collectionView.reloadData()
+
+        if let emojiIndex = presenter.selectedEmojiIndex {
+            collectionView.selectItem(at: IndexPath(item: emojiIndex, section: 0), animated: false, scrollPosition: [])
+        }
+        if let colorIndex = presenter.selectedColorIndex {
+            collectionView.selectItem(at: IndexPath(item: colorIndex, section: 1), animated: false, scrollPosition: [])
+        }
+        setCreateButtonEnabled(presenter.isFormValid)
     }
 }
 

@@ -13,6 +13,7 @@
 "common.ok" = "OK";
 "common.delete" = "Удалить";
 "common.edit" = "Редактировать";
+"common.save" = "Сохранить";
 
 /* MARK: - Trackers */
 "trackers.title" = "Трекеры";
@@ -49,6 +50,8 @@
 "newTracker.section.emoji" = "Emoji";
 "newTracker.section.color" = "Цвет";
 "newTracker.schedule.everyDay" = "Каждый день";
+
+"editTracker.title" = "Редакировать привычку";
 
 /* MARK: - Weekdays (full) */
 "weekday.monday" = "Понедельник";

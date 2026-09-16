@@ -7,13 +7,12 @@
 
 import UIKit
 
-protocol TrackersViewControllerProtocol: AnyObject {
+protocol TrackersViewControllerProtocol: AnyObject, ErrorAlertPresenting {
     var presenter: TrackersPresenterProtocol? { get set }
     func showWelcomeScreen()
     func showSearchErrorScreen()
     func showTrackers()
     func reloadTrackers()
-    func showErrorAlert(_ message: String)
 }
 
 final class TrackersViewController: UIViewController, TrackersViewControllerProtocol {
@@ -133,12 +132,6 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         collectionView.reloadData()
     }
 
-    func showErrorAlert(_ message: String) {
-        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("common.ok", comment: "Alert OK button"), style: .default))
-        present(alert, animated: true)
-    }
-
     // MARK: - Private Methods
 
     private func setupUI() {
@@ -205,12 +198,9 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     }
 
     private func showDeleteConfirmation(at indexPath: IndexPath) {
-        let alert = UIAlertController(title: nil, message: NSLocalizedString("tracker.delete.confirm", comment: "Confirm delete message"), preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("common.delete", comment: "Confirm delete"), style: .destructive) { [weak self] _ in
+        confirmDeletion(message: NSLocalizedString("tracker.delete.confirm", comment: "Confirm delete message")) { [weak self] in
             self?.presenter?.didTapDelete(at: indexPath.section, indexPath.row)
-        })
-        alert.addAction(UIAlertAction(title: NSLocalizedString("common.cancel", comment: "Cancel delete"), style: .cancel))
-        present(alert, animated: true)
+        }
     }
 }
 
@@ -282,7 +272,20 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
         return UIContextMenuConfiguration(actionProvider: { _ in
             UIMenu(children: [
-                UIAction(title: NSLocalizedString("common.edit", comment: "Edit tracker with context menu")) { _ in },
+                UIAction(title: NSLocalizedString("common.edit", comment: "Edit tracker with context menu")) { [weak self] _ in
+                    let data = self?.presenter?.trackerForEditing(at: indexPath.section, indexPath.row)
+                    let vc = NewTrackerViewController()
+                    let trackerDraft = TrackerDraft(
+                        id: data?.tracker.id,
+                        name: data?.tracker.title ?? "",
+                        emoji: data?.tracker.emoji,
+                        color: data?.tracker.color,
+                        schedule: data?.tracker.schedule ?? [],
+                        category: data?.category ?? ""
+                    )
+                    vc.configure(NewTrackerPresenter(currentTracker: trackerDraft, completedDays: data?.days ?? 0))
+                    self?.present(vc, animated: true)
+                },
                 UIAction(title: NSLocalizedString("common.delete", comment: "Delete tracker with context menu"), attributes: .destructive) { [weak self] _ in
                     self?.showDeleteConfirmation(at: indexPath)
                 },

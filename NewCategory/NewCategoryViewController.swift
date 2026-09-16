@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class NewCategoryViewController: UIViewController {
+final class NewCategoryViewController: UIViewController, ErrorAlertPresenting {
 
     // MARK: - Constants
 
@@ -124,11 +124,5 @@ final class NewCategoryViewController: UIViewController {
             readyButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             readyButton.heightAnchor.constraint(equalToConstant: Constants.buttonsHeight)
         ])
-    }
-
-    private func showErrorAlert(_ message: String) {
-        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("common.ok", comment: "Alert OK button"), style: .default))
-        present(alert, animated: true)
     }
 }

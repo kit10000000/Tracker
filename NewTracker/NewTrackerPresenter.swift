@@ -15,6 +15,14 @@ protocol NewTrackerPresenterProtocol: AnyObject {
     var emojiSectionTitle: String { get }
     var colorSectionTitle: String { get }
     var currentCategory: String { get }
+    var selectedEmojiIndex: Int? { get }
+    var selectedColorIndex: Int? { get }
+    var currentName: String { get }
+    var isEditing: Bool { get }
+    var screenTitle: String { get }
+    var buttonTitle: String { get }
+    var isFormValid: Bool { get }
+    var completedDaysText: String { get }
     func didSelectCategory(_ title: String)
     func emoji(at index: Int) -> String
     func colorName(at index: Int) -> String
@@ -33,7 +41,7 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
 
     weak var view: NewTrackerViewControllerProtocol?
 
-    var currentSchedule: [WeekDay] { schedule }
+    var currentSchedule: [WeekDay] { trackerDraft.schedule }
 
     var emojisCount: Int {
         TrackerOptions.emojis.count
@@ -45,46 +53,77 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
 
     var emojiSectionTitle: String { emojiTitle }
     var colorSectionTitle: String { colorTitle }
-    var currentCategory: String { selectedCategory }
+    var currentCategory: String { trackerDraft.category }
+    var currentName: String { trackerDraft.name }
+    var selectedEmojiIndex: Int? {
+        trackerDraft.emoji.flatMap { TrackerOptions.emojis.firstIndex(of: $0) }
+    }
+    var selectedColorIndex: Int? {
+        trackerDraft.color.flatMap { TrackerOptions.colors.firstIndex(of: $0) }
+    }
+    var isEditing: Bool { trackerDraft.id != nil }
+    var screenTitle: String {
+        trackerDraft.id != nil
+            ? NSLocalizedString("editTracker.title", comment: "Edit habit screen title")
+            : NSLocalizedString("newTracker.title", comment: "New habit screen title")
+    }
+
+    var buttonTitle: String {
+        trackerDraft.id != nil
+            ? NSLocalizedString("common.save", comment: "Edit habit button title")
+            : NSLocalizedString("common.create", comment: "New habit button title")
+    }
+
+    var isFormValid: Bool {
+        trackerDraft.isComplete
+    }
+
+    var completedDaysText: String {
+        String.localizedStringWithFormat(
+            NSLocalizedString("trackers.daysCompleted", comment: "Completed days counter"),
+            completedDays
+        )
+    }
 
     // MARK: - Private Properties
 
-    private var name = ""
     private let nameMaxLength = 38
-    private var schedule: [WeekDay] = []
-    private var selectedCategory = ""
-    private var selectedEmoji = ""
-    private var selectedColor = ""
     private let emojiTitle = NSLocalizedString("newTracker.section.emoji", comment: "Emoji section header")
     private let colorTitle = NSLocalizedString("newTracker.section.color", comment: "Color section header")
     private var trackerStore: TrackerStore
+    private var trackerDraft: TrackerDraft
+    private let completedDays: Int
 
     // MARK: - Initializers
 
-    init(trackerStore: TrackerStore = TrackerStore()) {
+    init(trackerStore: TrackerStore = TrackerStore(),
+         currentTracker: TrackerDraft = TrackerDraft(),
+         completedDays: Int = 0) {
         self.trackerStore = trackerStore
+        self.trackerDraft = currentTracker
+        self.completedDays = completedDays
     }
 
     // MARK: - Methods
 
     func didChangeName(_ name: String) {
-        self.name = name.trimmingCharacters(in: .whitespaces)
+        self.trackerDraft.name = name.trimmingCharacters(in: .whitespaces)
         view?.setCreateButtonEnabled(validateNewTrackerForm())
     }
 
     func didSelectSchedule(_ schedule: [WeekDay]) {
-        self.schedule = schedule
+        self.trackerDraft.schedule = schedule
         view?.setCreateButtonEnabled(validateNewTrackerForm())
         view?.updateTable(at: 1)
     }
 
     func didSelectColor(at index: Int) {
-        selectedColor = TrackerOptions.colors[index]
+        self.trackerDraft.color = TrackerOptions.colors[index]
         view?.setCreateButtonEnabled(validateNewTrackerForm())
     }
 
     func didSelectEmoji(at index: Int) {
-        selectedEmoji = TrackerOptions.emojis[index]
+        self.trackerDraft.emoji = TrackerOptions.emojis[index]
         view?.setCreateButtonEnabled(validateNewTrackerForm())
     }
 
@@ -98,13 +137,13 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
 
     func subtitle(for row: Int) -> String? {
         if row == 0 {
-            return selectedCategory
+            return self.trackerDraft.category
         } else {
-            guard !schedule.isEmpty else { return nil }
-            if schedule.count == WeekDay.allCases.count {
+            guard !self.trackerDraft.schedule.isEmpty else { return nil }
+            if self.trackerDraft.schedule.count == WeekDay.allCases.count {
                 return NSLocalizedString("newTracker.schedule.everyDay", comment: "Schedule subtitle when every day is selected")
             } else {
-                let sorted = schedule.sorted { $0.rawValue < $1.rawValue }
+                let sorted = self.trackerDraft.schedule.sorted { $0.rawValue < $1.rawValue }
                 return sorted.map { $0.shortName }.joined(separator: ", ")
             }
         }
@@ -115,15 +154,27 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     }
 
     func didTapCreate() {
-        if !validateNewTrackerForm() { return }
+        guard let emoji = trackerDraft.emoji,
+              let color = trackerDraft.color
+        else { return }
 
-        let newTracker = Tracker(id: UUID(), title: self.name, color: selectedColor, emoji: selectedEmoji, schedule: self.schedule)
-        self.trackerStore.addTracker(newTracker, toCategory: self.selectedCategory)
+        if let id = trackerDraft.id {
+            do {
+                let tracker = Tracker(id: id, title: trackerDraft.name, color: color, emoji: emoji, schedule: trackerDraft.schedule)
+                try trackerStore.updateTracker(tracker, toCategory: trackerDraft.category)
+            } catch TrackerStoreError.trackerDoesntExist {
+                view?.showErrorAlert(NSLocalizedString("tracker.error.absent", comment: "Tracker doesn't exist error"))
+            } catch {}
+        } else {
+            let tracker = Tracker(id: UUID(), title: trackerDraft.name, color: color, emoji: emoji, schedule: trackerDraft.schedule)
+            trackerStore.addTracker(tracker, toCategory: trackerDraft.category)
+        }
+
         view?.dismissForm()
     }
 
     func didSelectCategory(_ title: String) {
-        selectedCategory = title
+        self.trackerDraft.category = title
         view?.setCreateButtonEnabled(validateNewTrackerForm())
         view?.updateTable(at: 0)
     }
@@ -131,6 +182,6 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     // MARK: - Private Methods
 
     private func validateNewTrackerForm() -> Bool {
-        !name.isEmpty && !schedule.isEmpty && !selectedCategory.isEmpty && !selectedColor.isEmpty && !selectedEmoji.isEmpty
+        self.trackerDraft.isComplete
     }
 }

@@ -59,6 +59,10 @@ final class TrackersPresenterStub: TrackersPresenterProtocol {
         )
     }
 
+    func trackerForEditing(at section: Int, _ index: Int) -> (tracker: Tracker, category: String, days: Int) {
+        return (Tracker(id: UUID(), title: "", color: "", emoji: "", schedule: []), "", 0)
+    }
+
     func didSelectDate(_ date: Date) {}
 
     func didChangeSearchText(_ query: String) {}
@@ -66,4 +70,5 @@ final class TrackersPresenterStub: TrackersPresenterProtocol {
     func didTapComplete(at section: Int, _ index: Int) {}
 
     func didTapDelete(at section: Int, _ index: Int) {}
+
 }

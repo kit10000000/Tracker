@@ -45,6 +45,16 @@ final class TrackerStore {
         context.saveChanges()
     }
 
+    func updateTracker(_ tracker: Tracker, toCategory title: String) throws {
+        let found = try trackerCoreData(forId: tracker.id)
+        found.color = tracker.color
+        found.emoji = tracker.emoji
+        found.title = tracker.title
+        found.category = categoryStore.categoryCoreData(forTitle: title)
+        found.schedule = tracker.schedule as NSObject?
+        context.saveChanges()
+    }
+
     func trackerCoreData(forId id: UUID) throws -> TrackerCoreData {
         let request = TrackerCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "%K == %@", "id", id as CVarArg)
