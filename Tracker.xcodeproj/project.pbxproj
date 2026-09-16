@@ -54,6 +54,7 @@
 		78AE21973023C4AA00047489 /* Exceptions for "Trackers" folder in "Tracker" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				FilterViewController.swift,
 				TrackersCollectionViewCell.swift,
 				TrackerSectionHeaderView.swift,
 				TrackersPresenter.swift,

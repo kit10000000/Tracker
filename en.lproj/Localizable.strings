@@ -76,3 +76,9 @@
 "weekday.friday.short" = "Fri";
 "weekday.saturday.short" = "Sat";
 "weekday.sunday.short" = "Sun";
+
+"filter.all" = "All trackers";
+"filter.today" = "All trackers for today";
+"filter.completed" = "Completed";
+"filter.uncompleted" = "Uncompleted";
+"filter.title" = "Filters";

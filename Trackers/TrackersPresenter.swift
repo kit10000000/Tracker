@@ -11,6 +11,7 @@ protocol TrackersPresenterProtocol: AnyObject {
     var view: TrackersViewControllerProtocol? { get set }
     var categoriesCount: Int { get }
     var trackersCount: Int { get }
+    var currentFilter: TrackerFilter { get }
     func viewDidLoad()
     func numberOfTrackers(in section: Int) -> Int
     func categoryTitle(at index: Int) -> String
@@ -20,6 +21,7 @@ protocol TrackersPresenterProtocol: AnyObject {
     func didTapComplete(at section: Int, _ index: Int)
     func didTapDelete(at section: Int, _ index: Int)
     func trackerForEditing(at section: Int, _ index: Int) -> (tracker: Tracker, category: String, days: Int)
+    func didSelectFilter(_ filter: TrackerFilter)
 }
 
 final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDelegate {
@@ -35,6 +37,8 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
     var trackersCount: Int {
         visibleCategories.map { $0.trackers.count }.reduce(0, +)
     }
+
+    private(set) var currentFilter: TrackerFilter = .all
 
     // MARK: - Private Properties
 
@@ -129,16 +133,28 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
         return (tracker, category, days)
     }
 
+    func didSelectFilter(_ filter: TrackerFilter) {
+        currentFilter = filter
+        if filter == .today {
+            currentDate = Date()
+            view?.setDate(date: currentDate)
+        }
+        updateView()
+    }
+
     // MARK: - Private Methods
 
     private func updateView() {
-        filterVisibleCategories()
         updateCompletedIds()
+        filterVisibleCategories()
         if trackersCount == 0 {
-            if searchQuery.isEmpty {
-                view?.showWelcomeScreen()
-            } else {
+            let isFiltering = !searchQuery.isEmpty
+                || currentFilter == .completed
+                || currentFilter == .uncompleted
+            if isFiltering {
                 view?.showSearchErrorScreen()
+            } else {
+                view?.showWelcomeScreen()
             }
         } else {
             view?.showTrackers()
@@ -162,8 +178,20 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
                 tracker.schedule.contains(weekDay) &&
                 (searchQuery.isEmpty || tracker.title.localizedCaseInsensitiveContains(searchQuery))
             }
-            if !scheduled.isEmpty {
-                visibleCategories.append(TrackerCategory(title: category.title, trackers: scheduled))
+
+            let filtered = scheduled.filter {tracker in
+                switch currentFilter {
+                case .all, .today:
+                    true
+                case .completed:
+                   completedIds.contains(tracker.id)
+                case .uncompleted:
+                   !completedIds.contains(tracker.id)
+                }
+            }
+
+            if !filtered.isEmpty {
+                visibleCategories.append(TrackerCategory(title: category.title, trackers: filtered))
             }
         }
     }

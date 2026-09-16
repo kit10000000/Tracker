@@ -13,7 +13,7 @@ final class TrackersPresenterStub: TrackersPresenterProtocol {
     // MARK: - Properties
 
     var view: (any TrackersViewControllerProtocol)?
-
+    var currentFilter: TrackerFilter
     var categoriesCount: Int {
         categories.count
     }
@@ -30,6 +30,7 @@ final class TrackersPresenterStub: TrackersPresenterProtocol {
 
     init(categories: [TrackerCategory] = MockData.categories) {
         self.categories = categories
+        self.currentFilter = .all
     }
 
     // MARK: - Methods
@@ -70,5 +71,7 @@ final class TrackersPresenterStub: TrackersPresenterProtocol {
     func didTapComplete(at section: Int, _ index: Int) {}
 
     func didTapDelete(at section: Int, _ index: Int) {}
+
+    func didSelectFilter(_ filter: TrackerFilter) {}
 
 }

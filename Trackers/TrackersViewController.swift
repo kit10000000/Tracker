@@ -13,6 +13,7 @@ protocol TrackersViewControllerProtocol: AnyObject, ErrorAlertPresenting {
     func showSearchErrorScreen()
     func showTrackers()
     func reloadTrackers()
+    func setDate(date: Date)
 }
 
 final class TrackersViewController: UIViewController, TrackersViewControllerProtocol {
@@ -84,6 +85,21 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         return picker
     }()
 
+    private lazy var filterButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle(NSLocalizedString("filter.title", comment: "Filter button title"), for: .normal)
+        button.setTitleColor(UIColor(resource: .white), for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        button.layer.cornerRadius = 16
+        button.layer.masksToBounds = true
+        button.backgroundColor = UIColor(resource: .ypBlue)
+        button.addAction(UIAction { [weak self] _ in
+            self?.didTapFilter()
+        }, for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -110,6 +126,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         welcomeTextLabel.isHidden = false
         searchImageView.isHidden = true
         searchTextLabel.isHidden = true
+        filterButton.isHidden = true
     }
 
     func showSearchErrorScreen() {
@@ -118,6 +135,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         welcomeTextLabel.isHidden = true
         searchImageView.isHidden = false
         searchTextLabel.isHidden = false
+        filterButton.isHidden = false
     }
 
     func showTrackers() {
@@ -126,10 +144,15 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         welcomeTextLabel.isHidden = true
         searchImageView.isHidden = true
         searchTextLabel.isHidden = true
+        filterButton.isHidden = false
     }
 
     func reloadTrackers() {
         collectionView.reloadData()
+    }
+
+    func setDate(date: Date) {
+        datePicker.date = date
     }
 
     // MARK: - Private Methods
@@ -167,6 +190,14 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
         collectionView.dataSource = self
+        view.addSubview(filterButton)
+        NSLayoutConstraint.activate([
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            filterButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 120),
+            filterButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -120),
+            filterButton.heightAnchor.constraint(equalToConstant: 50)
+        ])
     }
 
     private func setupNavigationBar() {
@@ -201,6 +232,12 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         confirmDeletion(message: NSLocalizedString("tracker.delete.confirm", comment: "Confirm delete message")) { [weak self] in
             self?.presenter?.didTapDelete(at: indexPath.section, indexPath.row)
         }
+    }
+
+    private func didTapFilter() {
+        let vc = FilterViewController(selectedFilter: presenter?.currentFilter ?? .all)
+        vc.delegate = self
+        present(vc, animated: true)
     }
 }
 
@@ -330,5 +367,13 @@ extension TrackersViewController: TrackersCollectionViewCellDelegate {
     func trackerCollectionViewCellDidTapComplete(_ cell: TrackersCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         presenter?.didTapComplete(at: indexPath.section, indexPath.row)
+    }
+}
+
+// MARK: - FilterViewControllerDelegate
+
+extension TrackersViewController: FilterViewControllerDelegate {
+    func didSelectFilter(_ filter: TrackerFilter) {
+        presenter?.didSelectFilter(filter)
     }
 }

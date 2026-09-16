@@ -77,3 +77,9 @@
 "weekday.friday.short" = "Пт";
 "weekday.saturday.short" = "Сб";
 "weekday.sunday.short" = "Вс";
+
+"filter.all" = "Все трекеры";
+"filter.today" = "Все трекеры на сегодня";
+"filter.completed" = "Завершенные";
+"filter.uncompleted" = "Не завершенные";
+"filter.title" = "Фильтры";
