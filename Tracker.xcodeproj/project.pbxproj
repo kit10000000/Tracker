@@ -45,7 +45,9 @@
 		78AE21963023C4AA00047489 /* Exceptions for "Statistics" folder in "Tracker" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				StatisticsCardView.swift,
 				StatisticsViewController.swift,
+				StatisticsViewModel.swift,
 			);
 			target = 78D78B65301FA2A300EC6EBF /* Tracker */;
 		};

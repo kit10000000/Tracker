@@ -24,6 +24,8 @@
 
 /* MARK: - Statistics */
 "statistics.title" = "Статистика";
+"statistics.placeholder.empty" = "Анализировать пока нечего";
+"statistics.completed" = "Трекеров завершено";
 
 /* MARK: - Schedule */
 "schedule.title" = "Расписание";

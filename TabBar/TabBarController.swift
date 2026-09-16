@@ -23,8 +23,10 @@ final class TabBarController: UITabBarController {
             image: UIImage(resource: .trackersTab),
             selectedImage: nil
         )
+        let statisticsViewController = StatisticsViewController()
+        statisticsViewController.initialize(viewModel: StatisticsViewModel())
 
-        let statisticsVC = UINavigationController(rootViewController: StatisticsViewController())
+        let statisticsVC = UINavigationController(rootViewController: statisticsViewController)
         statisticsVC.tabBarItem = UITabBarItem(
             title: NSLocalizedString("statistics.title", comment: "Statistics tab bar title"),
             image: UIImage(resource: .statisticsTab),

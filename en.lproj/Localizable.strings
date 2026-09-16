@@ -24,6 +24,8 @@
 
 /* MARK: - Statistics */
 "statistics.title" = "Statistics";
+"statistics.placeholder.empty" = "Nothing to analyze";
+"statistics.completed" = "Trackers finished";
 
 /* MARK: - Schedule */
 "schedule.title" = "Schedule";
