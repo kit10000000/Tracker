@@ -32,11 +32,16 @@
 "category.title" = "Категория";
 "category.add" = "Добавить Категорию";
 "category.placeholder.empty" = "Привычки и события можно объединить по смыслу";
+"category.error.absent" = "Категория не существует";
+"category.delete.confirm" = "Вы уверены, что хотите удалить категорию? (добавленные трекеры также будут удалены) ";
+
 
 /* MARK: - New Category */
 "newCategory.title" = "Новая категория";
 "newCategory.namePlaceholder" = "Введите название категории";
 "newCategory.error.duplicate" = "Категория с таким названием уже существует";
+
+"editCategory.title" = "Редактирвоание категории";
 
 /* MARK: - Onboarding */
 "onboarding.page1.title" = "Отслеживайте только то, что хотите";

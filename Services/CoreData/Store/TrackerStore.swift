@@ -5,12 +5,7 @@
 //  Created by Ekaterina on 04.09.2026.
 //
 
-import Foundation
 import CoreData
-
-enum TrackerStoreError: Error {
-    case trackerDoesntExist
-}
 
 final class TrackerStore {
 
@@ -58,7 +53,7 @@ final class TrackerStore {
     func trackerCoreData(forId id: UUID) throws -> TrackerCoreData {
         let request = TrackerCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "%K == %@", "id", id as CVarArg)
-        guard let found = context.fetchOrEmpty(request).first else { throw TrackerStoreError.trackerDoesntExist }
+        guard let found = context.fetchOrEmpty(request).first else { throw StoreError.entityDoesntExist }
         return found
     }
 }

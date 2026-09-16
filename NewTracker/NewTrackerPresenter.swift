@@ -162,7 +162,7 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
             do {
                 let tracker = Tracker(id: id, title: trackerDraft.name, color: color, emoji: emoji, schedule: trackerDraft.schedule)
                 try trackerStore.updateTracker(tracker, toCategory: trackerDraft.category)
-            } catch TrackerStoreError.trackerDoesntExist {
+            } catch StoreError.entityDoesntExist {
                 view?.showErrorAlert(NSLocalizedString("tracker.error.absent", comment: "Tracker doesn't exist error"))
             } catch {}
         } else {

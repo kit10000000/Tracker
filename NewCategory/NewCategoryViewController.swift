@@ -74,6 +74,7 @@ final class NewCategoryViewController: UIViewController, ErrorAlertPresenting {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        prefill()
     }
 
     // MARK: - Methods
@@ -124,5 +125,13 @@ final class NewCategoryViewController: UIViewController, ErrorAlertPresenting {
             readyButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             readyButton.heightAnchor.constraint(equalToConstant: Constants.buttonsHeight)
         ])
+    }
+
+    private func prefill() {
+        guard let viewModel, viewModel.isEditing else { return }
+
+        nameTextField.text = viewModel.initialTitle
+        titleTextLabel.text = NSLocalizedString("editCategory.title", comment: "Edit category screen title")
+        viewModel.didChangeText(viewModel.initialTitle)
     }
 }

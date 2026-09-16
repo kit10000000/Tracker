@@ -5,7 +5,6 @@
 //  Created by Ekaterina on 04.09.2026.
 //
 
-import Foundation
 import CoreData
 
 protocol TrackerCategoryStoreDelegate: AnyObject {
@@ -69,6 +68,23 @@ final class TrackerCategoryStore: NSObject {
         let newCategory = TrackerCategoryCoreData(context: self.context)
         newCategory.title = title
         self.context.saveChanges()
+    }
+
+    func deleteCategory(title: String) throws {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.title), title)
+        guard let found = context.fetchOrEmpty(request).first else { throw StoreError.entityDoesntExist }
+        context.delete(found)
+        context.saveChanges()
+    }
+
+    func updateCategory(from oldTitle: String, to newTitle: String) throws {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.title), oldTitle)
+        guard let found = context.fetchOrEmpty(request).first else { throw StoreError.entityDoesntExist }
+
+        found.title = newTitle
+        context.saveChanges()
     }
 
     func categoryCoreData(forTitle: String) -> TrackerCategoryCoreData {

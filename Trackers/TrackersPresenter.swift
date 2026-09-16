@@ -107,7 +107,7 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
 
         do {
             try trackerStore.deleteTracker(tracker.id)
-        } catch TrackerStoreError.trackerDoesntExist {
+        } catch StoreError.entityDoesntExist {
             view?.showErrorAlert(NSLocalizedString("tracker.error.absent", comment: "Tracker doesn't exist error"))
         } catch {}
     }

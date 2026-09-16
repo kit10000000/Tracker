@@ -32,11 +32,15 @@
 "category.title" = "Category";
 "category.add" = "Add Category";
 "category.placeholder.empty" = "Habits and events can be grouped by meaning";
+"category.error.absent" = "Category doesn't exist";
+"category.delete.confirm" = "Are you sure you want to delete the category? (assigned trackers also will be deleted) ";
 
 /* MARK: - New Category */
 "newCategory.title" = "New category";
 "newCategory.namePlaceholder" = "Enter category name";
 "newCategory.error.duplicate" = "A category with this name already exists";
+
+"editCategory.title" = "Edit category";
 
 /* MARK: - Onboarding */
 "onboarding.page1.title" = "Track only what you want";

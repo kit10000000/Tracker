@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CategoryListViewController: UIViewController {
+final class CategoryListViewController: UIViewController, ErrorAlertPresenting {
 
     // MARK: - Constants
 
@@ -111,6 +111,10 @@ final class CategoryListViewController: UIViewController {
             self.starImageView.isHidden = !categories.isEmpty
             self.textLabel.isHidden = !categories.isEmpty
         }
+
+        viewModel.onError = { [weak self] message in
+            self?.showErrorAlert(message)
+        }
     }
 
     private func setupUI() {
@@ -164,6 +168,21 @@ final class CategoryListViewController: UIViewController {
 
         present(newCategoryViewController, animated: true)
     }
+
+    private func editCategory(at index: Int) {
+        guard let oldTitle = viewModel?.cell(at: index).title else { return }
+
+        let editViewModel = NewCategoryViewModel(editingTitle: oldTitle)
+        let newCategoryViewController = NewCategoryViewController()
+        newCategoryViewController.initialize(viewModel: editViewModel)
+
+        editViewModel.onCategoryUpdated = { [weak self] newTitle in
+            self?.viewModel?.updateCategory(from: oldTitle, to: newTitle)
+            self?.dismiss(animated: true)
+        }
+
+        present(newCategoryViewController, animated: true)
+    }
 }
 
 // MARK: - UITableViewDelegate
@@ -171,6 +190,23 @@ final class CategoryListViewController: UIViewController {
 extension CategoryListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel?.didSelectCategory(at: indexPath.row)
+    }
+
+    func tableView(_ tableView: UITableView,
+                   contextMenuConfigurationForRowAt indexPath: IndexPath,
+                   point: CGPoint) -> UIContextMenuConfiguration? {
+        UIContextMenuConfiguration(actionProvider: { _ in
+            UIMenu(children: [
+                UIAction(title: NSLocalizedString("common.edit", comment: "")) { [weak self] _ in
+                    self?.editCategory(at: indexPath.row)
+                },
+                UIAction(title: NSLocalizedString("common.delete", comment: ""), attributes: .destructive) { [weak self] _ in
+                    self?.confirmDeletion(message: NSLocalizedString("category.delete.confirm", comment: "")) {
+                        self?.viewModel?.deleteCategory(at: indexPath.row)
+                    }
+                }
+            ])
+        })
     }
 }
 
