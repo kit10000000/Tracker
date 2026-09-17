@@ -38,7 +38,7 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
         visibleCategories.map { $0.trackers.count }.reduce(0, +)
     }
 
-    private(set) var currentFilter: TrackerFilter = .all
+    var currentFilter: TrackerFilter { filterStorage.filter }
 
     // MARK: - Private Properties
 
@@ -51,6 +51,7 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
     private let categoryStore: TrackerCategoryStore
     private let recordStore: TrackerRecordStore
     private let trackerStore: TrackerStore
+    private let filterStorage: FilterStorage
 
     private var isFutureDate: Bool {
         Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) == .orderedDescending
@@ -59,10 +60,13 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
     // MARK: - Initializers
 
     init(categoryStore: TrackerCategoryStore = TrackerCategoryStore(),
-         recordStore: TrackerRecordStore = TrackerRecordStore(), trackerStore: TrackerStore = TrackerStore()) {
+         recordStore: TrackerRecordStore = TrackerRecordStore(),
+         trackerStore: TrackerStore = TrackerStore(),
+         filterStorage: FilterStorage = FilterStorage()) {
         self.categoryStore = categoryStore
         self.recordStore = recordStore
         self.trackerStore = trackerStore
+        self.filterStorage = filterStorage
     }
 
     // MARK: - Methods
@@ -134,7 +138,7 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
     }
 
     func didSelectFilter(_ filter: TrackerFilter) {
-        currentFilter = filter
+        filterStorage.filter = filter
         if filter == .today {
             currentDate = Date()
             view?.setDate(date: currentDate)
@@ -179,14 +183,14 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
                 (searchQuery.isEmpty || tracker.title.localizedCaseInsensitiveContains(searchQuery))
             }
 
-            let filtered = scheduled.filter {tracker in
+            let filtered = scheduled.filter { tracker in
                 switch currentFilter {
                 case .all, .today:
                     true
                 case .completed:
-                   completedIds.contains(tracker.id)
+                    completedIds.contains(tracker.id)
                 case .uncompleted:
-                   !completedIds.contains(tracker.id)
+                    !completedIds.contains(tracker.id)
                 }
             }
 

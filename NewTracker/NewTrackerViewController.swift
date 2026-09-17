@@ -38,6 +38,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         static let buttonsSideInset: CGFloat = 20
         static let buttonsTopSpacing: CGFloat = 20
         static let buttonsHeight: CGFloat = 60
+        static let settingsCellFontSize: CGFloat = 17
     }
 
     private enum TrackerSection: Int, CaseIterable {
@@ -79,7 +80,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = NSLocalizedString("newTracker.namePlaceholder", comment: "Tracker name field placeholder")
-        textField.font = UIFont.systemFont(ofSize: 17)
+        textField.font = UIFont.systemFont(ofSize: Constants.settingsCellFontSize)
         textField.backgroundColor = UIColor(resource: .background)
         textField.layer.cornerRadius = 16
         textField.layer.masksToBounds = true
@@ -396,8 +397,8 @@ extension NewTrackerViewController: UITableViewDataSource {
         var content = cell.defaultContentConfiguration()
         content.text = settingsItems[indexPath.row]
         content.secondaryText = presenter?.subtitle(for: indexPath.row)
-        content.textProperties.font = UIFont.systemFont(ofSize: 17)
-        content.secondaryTextProperties.font = UIFont.systemFont(ofSize: 17)
+        content.textProperties.font = UIFont.systemFont(ofSize: Constants.settingsCellFontSize)
+        content.secondaryTextProperties.font = UIFont.systemFont(ofSize: Constants.settingsCellFontSize)
         content.secondaryTextProperties.color = UIColor(resource: .gray)
         cell.contentConfiguration = content
         cell.isUserInteractionEnabled = true

@@ -34,8 +34,6 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
 
     weak var delegate: TrackersCollectionViewCellDelegate?
 
-    // MARK: - Properties
-
     lazy var cardView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = Constants.cardCornerRadius

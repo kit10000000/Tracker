@@ -28,6 +28,9 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         static let interItemSpacing: CGFloat = 9
         static let cellHeight: CGFloat = 148
         static let headerHeight: CGFloat = 46
+        static let filterButtonSideInset: CGFloat = 120
+        static let filterButtonHeight: CGFloat = 50
+        static let collectionBottomInset: CGFloat = 82
     }
 
     // MARK: - Properties
@@ -76,9 +79,13 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
 
     private lazy var datePicker: UIDatePicker = {
         let picker = UIDatePicker()
+        picker.overrideUserInterfaceStyle = .light
         picker.datePickerMode = .date
         picker.preferredDatePickerStyle = .compact
         picker.locale = Locale.current
+        picker.backgroundColor = UIColor(resource: .datePicker)
+        picker.layer.cornerRadius = 8
+        picker.layer.masksToBounds = true
         picker.addAction(UIAction { [weak self] _ in
             self?.datePickerValueChanged()
         }, for: .valueChanged)
@@ -88,7 +95,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     private lazy var filterButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle(NSLocalizedString("filter.title", comment: "Filter button title"), for: .normal)
-        button.setTitleColor(UIColor(resource: .white), for: .normal)
+        button.setTitleColor(UIColor.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
@@ -99,6 +106,8 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+
+    private let analytics = Analytics()
 
     // MARK: - Lifecycle
 
@@ -111,6 +120,16 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         collectionView.delegate = self
 
         setupUI()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        analytics.report(.open)
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        analytics.report(.close)
     }
 
     // MARK: - Methods
@@ -190,13 +209,15 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
         collectionView.dataSource = self
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: Constants.collectionBottomInset, right: 0)
+        collectionView.verticalScrollIndicatorInsets.bottom = Constants.collectionBottomInset
         view.addSubview(filterButton)
         NSLayoutConstraint.activate([
             filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            filterButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 120),
-            filterButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -120),
-            filterButton.heightAnchor.constraint(equalToConstant: 50)
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Constants.sideInset),
+            filterButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.filterButtonSideInset),
+            filterButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.filterButtonSideInset),
+            filterButton.heightAnchor.constraint(equalToConstant: Constants.filterButtonHeight)
         ])
     }
 
@@ -222,6 +243,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let newTrackerViewController = NewTrackerViewController()
         newTrackerViewController.configure(NewTrackerPresenter())
         present(newTrackerViewController, animated: true)
+        analytics.report(.click, item: .addTrack)
     }
 
     private func datePickerValueChanged() {
@@ -238,6 +260,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let vc = FilterViewController(selectedFilter: presenter?.currentFilter ?? .all)
         vc.delegate = self
         present(vc, animated: true)
+        analytics.report(.click, item: .filter)
     }
 }
 
@@ -322,9 +345,11 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                     )
                     vc.configure(NewTrackerPresenter(currentTracker: trackerDraft, completedDays: data?.days ?? 0))
                     self?.present(vc, animated: true)
+                    self?.analytics.report(.click, item: .edit)
                 },
                 UIAction(title: NSLocalizedString("common.delete", comment: "Delete tracker with context menu"), attributes: .destructive) { [weak self] _ in
                     self?.showDeleteConfirmation(at: indexPath)
+                    self?.analytics.report(.click, item: .delete)
                 },
             ])
         })
@@ -367,6 +392,7 @@ extension TrackersViewController: TrackersCollectionViewCellDelegate {
     func trackerCollectionViewCellDidTapComplete(_ cell: TrackersCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         presenter?.didTapComplete(at: indexPath.section, indexPath.row)
+        analytics.report(.click, item: .track)
     }
 }
 

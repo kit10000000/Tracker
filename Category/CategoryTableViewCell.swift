@@ -15,6 +15,7 @@ final class CategoryTableViewCell: UITableViewCell {
 
     private enum Constants {
         static let cornerRadius: CGFloat = 11
+        static let sideInset: CGFloat = 16
     }
 
     // MARK: - Private Properties
@@ -57,8 +58,8 @@ final class CategoryTableViewCell: UITableViewCell {
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
             titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
