@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class NewCategoryViewController: UIViewController {
+final class NewCategoryViewController: UIViewController, ErrorAlertPresenting {
 
     // MARK: - Constants
 
@@ -25,7 +25,7 @@ final class NewCategoryViewController: UIViewController {
 
     private lazy var titleTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая категория"
+        label.text = NSLocalizedString("newCategory.title", comment: "New category screen title")
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -34,7 +34,7 @@ final class NewCategoryViewController: UIViewController {
 
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название категории"
+        textField.placeholder = NSLocalizedString("newCategory.namePlaceholder", comment: "Category name field placeholder")
         textField.font = UIFont.systemFont(ofSize: 17)
         textField.backgroundColor = UIColor(resource: .background)
         textField.layer.cornerRadius = 16
@@ -55,7 +55,7 @@ final class NewCategoryViewController: UIViewController {
 
     private lazy var readyButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(NSLocalizedString("common.done", comment: "Done button title"), for: .normal)
         button.setTitleColor(UIColor(resource: .ypWhite), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
@@ -74,6 +74,7 @@ final class NewCategoryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        prefill()
     }
 
     // MARK: - Methods
@@ -126,9 +127,11 @@ final class NewCategoryViewController: UIViewController {
         ])
     }
 
-    private func showErrorAlert(_ message: String) {
-        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+    private func prefill() {
+        guard let viewModel, viewModel.isEditing else { return }
+
+        nameTextField.text = viewModel.initialTitle
+        titleTextLabel.text = NSLocalizedString("editCategory.title", comment: "Edit category screen title")
+        viewModel.didChangeText(viewModel.initialTitle)
     }
 }

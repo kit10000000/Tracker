@@ -1,0 +1,87 @@
+/*
+  Localizable.strings
+  Tracker
+
+  Created by Ekaterina on 14.09.2026.
+
+*/
+
+/* MARK: - Common */
+"common.done" = "Done";
+"common.cancel" = "Cancel";
+"common.create" = "Create";
+"common.ok" = "OK";
+"common.delete" = "Delete";
+"common.edit" = "Edit";
+"common.save" = "Save";
+
+/* MARK: - Trackers */
+"trackers.title" = "Trackers";
+"trackers.placeholder.empty" = "What shall we track?";
+"trackers.placeholder.notFound" = "Nothing found";
+"tracker.delete.confirm" = "Are you sure you want to delete the tracker?";
+"tracker.error.absent" = "Tracker doesn't exist";
+
+/* MARK: - Statistics */
+"statistics.title" = "Statistics";
+"statistics.placeholder.empty" = "Nothing to analyze";
+"statistics.completed" = "Trackers finished";
+
+/* MARK: - Schedule */
+"schedule.title" = "Schedule";
+
+/* MARK: - Category */
+"category.title" = "Category";
+"category.add" = "Add Category";
+"category.placeholder.empty" = "Habits and events can be grouped by meaning";
+"category.error.absent" = "Category doesn't exist";
+"category.delete.confirm" = "Are you sure you want to delete the category? (assigned trackers also will be deleted) ";
+
+/* MARK: - New Category */
+"newCategory.title" = "New category";
+"newCategory.namePlaceholder" = "Enter category name";
+"newCategory.error.duplicate" = "A category with this name already exists";
+
+"editCategory.title" = "Edit category";
+
+/* MARK: - Onboarding */
+"onboarding.page1.title" = "Track only what you want";
+"onboarding.page2.title" = "Even if it's not liters of water and yoga";
+"onboarding.button" = "Wow, technology!";
+
+/* MARK: - New Tracker */
+"newTracker.title" = "New habit";
+"newTracker.namePlaceholder" = "Enter tracker name";
+"newTracker.nameLimit" = "38 character limit";
+"newTracker.section.emoji" = "Emoji";
+"newTracker.section.color" = "Color";
+"newTracker.schedule.everyDay" = "Every day";
+
+"editTracker.title" = "Edit habit";
+
+/* MARK: - Weekdays (full) */
+"weekday.monday" = "Monday";
+"weekday.tuesday" = "Tuesday";
+"weekday.wednesday" = "Wednesday";
+"weekday.thursday" = "Thursday";
+"weekday.friday" = "Friday";
+"weekday.saturday" = "Saturday";
+"weekday.sunday" = "Sunday";
+
+/* MARK: - Weekdays (short) */
+"weekday.monday.short" = "Mon";
+"weekday.tuesday.short" = "Tue";
+"weekday.wednesday.short" = "Wed";
+"weekday.thursday.short" = "Thu";
+"weekday.friday.short" = "Fri";
+"weekday.saturday.short" = "Sat";
+"weekday.sunday.short" = "Sun";
+
+"filter.all" = "All trackers";
+"filter.today" = "All trackers for today";
+"filter.completed" = "Completed";
+"filter.uncompleted" = "Uncompleted";
+"filter.title" = "Filters";
+
+
+"error.generic" = "Something went wrong";

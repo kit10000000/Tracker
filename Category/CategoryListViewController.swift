@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CategoryListViewController: UIViewController {
+final class CategoryListViewController: UIViewController, ErrorAlertPresenting {
 
     // MARK: - Constants
 
@@ -29,7 +29,7 @@ final class CategoryListViewController: UIViewController {
 
     private lazy var titleTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Категория"
+        label.text = NSLocalizedString("category.title", comment: "Category screen title")
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -52,7 +52,7 @@ final class CategoryListViewController: UIViewController {
 
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Добавить Категорию", for: .normal)
+        button.setTitle(NSLocalizedString("category.add", comment: "Add category button title"), for: .normal)
         button.setTitleColor(UIColor(resource: .ypWhite), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
@@ -74,7 +74,7 @@ final class CategoryListViewController: UIViewController {
 
     private lazy var textLabel: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно объединить по смыслу"
+        label.text = NSLocalizedString("category.placeholder.empty", comment: "Empty categories placeholder")
         label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -110,6 +110,10 @@ final class CategoryListViewController: UIViewController {
 
             self.starImageView.isHidden = !categories.isEmpty
             self.textLabel.isHidden = !categories.isEmpty
+        }
+
+        viewModel.onError = { [weak self] message in
+            self?.showErrorAlert(message)
         }
     }
 
@@ -164,6 +168,21 @@ final class CategoryListViewController: UIViewController {
 
         present(newCategoryViewController, animated: true)
     }
+
+    private func editCategory(at index: Int) {
+        guard let oldTitle = viewModel?.cell(at: index).title else { return }
+
+        let editViewModel = NewCategoryViewModel(editingTitle: oldTitle)
+        let newCategoryViewController = NewCategoryViewController()
+        newCategoryViewController.initialize(viewModel: editViewModel)
+
+        editViewModel.onCategoryUpdated = { [weak self] newTitle in
+            self?.viewModel?.updateCategory(from: oldTitle, to: newTitle)
+            self?.dismiss(animated: true)
+        }
+
+        present(newCategoryViewController, animated: true)
+    }
 }
 
 // MARK: - UITableViewDelegate
@@ -171,6 +190,23 @@ final class CategoryListViewController: UIViewController {
 extension CategoryListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel?.didSelectCategory(at: indexPath.row)
+    }
+
+    func tableView(_ tableView: UITableView,
+                   contextMenuConfigurationForRowAt indexPath: IndexPath,
+                   point: CGPoint) -> UIContextMenuConfiguration? {
+        UIContextMenuConfiguration(actionProvider: { _ in
+            UIMenu(children: [
+                UIAction(title: NSLocalizedString("common.edit", comment: "")) { [weak self] _ in
+                    self?.editCategory(at: indexPath.row)
+                },
+                UIAction(title: NSLocalizedString("common.delete", comment: ""), attributes: .destructive) { [weak self] _ in
+                    self?.confirmDeletion(message: NSLocalizedString("category.delete.confirm", comment: "")) {
+                        self?.viewModel?.deleteCategory(at: indexPath.row)
+                    }
+                }
+            ])
+        })
     }
 }
 

@@ -11,6 +11,7 @@ protocol TrackersPresenterProtocol: AnyObject {
     var view: TrackersViewControllerProtocol? { get set }
     var categoriesCount: Int { get }
     var trackersCount: Int { get }
+    var currentFilter: TrackerFilter { get }
     func viewDidLoad()
     func numberOfTrackers(in section: Int) -> Int
     func categoryTitle(at index: Int) -> String
@@ -18,6 +19,9 @@ protocol TrackersPresenterProtocol: AnyObject {
     func didSelectDate(_ date: Date)
     func didChangeSearchText(_ query: String)
     func didTapComplete(at section: Int, _ index: Int)
+    func didTapDelete(at section: Int, _ index: Int)
+    func trackerForEditing(at section: Int, _ index: Int) -> (tracker: Tracker, category: String, days: Int)
+    func didSelectFilter(_ filter: TrackerFilter)
 }
 
 final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDelegate {
@@ -34,6 +38,8 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
         visibleCategories.map { $0.trackers.count }.reduce(0, +)
     }
 
+    var currentFilter: TrackerFilter { filterStorage.filter }
+
     // MARK: - Private Properties
 
     private var categories: [TrackerCategory] { categoryStore.categories() }
@@ -44,6 +50,8 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
     private var searchQuery = ""
     private let categoryStore: TrackerCategoryStore
     private let recordStore: TrackerRecordStore
+    private let trackerStore: TrackerStore
+    private let filterStorage: FilterStorage
 
     private var isFutureDate: Bool {
         Calendar.current.compare(currentDate, to: Date(), toGranularity: .day) == .orderedDescending
@@ -52,9 +60,13 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
     // MARK: - Initializers
 
     init(categoryStore: TrackerCategoryStore = TrackerCategoryStore(),
-         recordStore: TrackerRecordStore = TrackerRecordStore()) {
+         recordStore: TrackerRecordStore = TrackerRecordStore(),
+         trackerStore: TrackerStore = TrackerStore(),
+         filterStorage: FilterStorage = FilterStorage()) {
         self.categoryStore = categoryStore
         self.recordStore = recordStore
+        self.trackerStore = trackerStore
+        self.filterStorage = filterStorage
     }
 
     // MARK: - Methods
@@ -98,6 +110,19 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
         view?.reloadTrackers()
     }
 
+    func didTapDelete(at section: Int, _ index: Int) {
+        let tracker = visibleCategories[section].trackers[index]
+
+        do {
+            try trackerStore.deleteTracker(tracker.id)
+        } catch StoreError.entityDoesntExist {
+            view?.showErrorAlert(NSLocalizedString("tracker.error.absent", comment: "Tracker doesn't exist error"))
+        } catch {
+            AppLogger.error("Error: \(error.localizedDescription)")
+            view?.showErrorAlert(NSLocalizedString("error.generic", comment: "Something went wrong"))
+        }
+    }
+
     func didSelectDate(_ date: Date) {
         currentDate = date
         updateView()
@@ -108,16 +133,35 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
         updateView()
     }
 
+    func trackerForEditing(at section: Int, _ index: Int) -> (tracker: Tracker, category: String, days: Int) {
+        let tracker = visibleCategories[section].trackers[index]
+        let category = visibleCategories[section].title
+        let days = completedTrackers.count(where: { $0.trackerId == tracker.id })
+        return (tracker, category, days)
+    }
+
+    func didSelectFilter(_ filter: TrackerFilter) {
+        filterStorage.filter = filter
+        if filter == .today {
+            currentDate = Date()
+            view?.setDate(date: currentDate)
+        }
+        updateView()
+    }
+
     // MARK: - Private Methods
 
     private func updateView() {
-        filterVisibleCategories()
         updateCompletedIds()
+        filterVisibleCategories()
         if trackersCount == 0 {
-            if searchQuery.isEmpty {
-                view?.showWelcomeScreen()
-            } else {
+            let isFiltering = !searchQuery.isEmpty
+                || currentFilter == .completed
+                || currentFilter == .uncompleted
+            if isFiltering {
                 view?.showSearchErrorScreen()
+            } else {
+                view?.showWelcomeScreen()
             }
         } else {
             view?.showTrackers()
@@ -141,8 +185,20 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
                 tracker.schedule.contains(weekDay) &&
                 (searchQuery.isEmpty || tracker.title.localizedCaseInsensitiveContains(searchQuery))
             }
-            if !scheduled.isEmpty {
-                visibleCategories.append(TrackerCategory(title: category.title, trackers: scheduled))
+
+            let filtered = scheduled.filter { tracker in
+                switch currentFilter {
+                case .all, .today:
+                    true
+                case .completed:
+                    completedIds.contains(tracker.id)
+                case .uncompleted:
+                    !completedIds.contains(tracker.id)
+                }
+            }
+
+            if !filtered.isEmpty {
+                visibleCategories.append(TrackerCategory(title: category.title, trackers: filtered))
             }
         }
     }

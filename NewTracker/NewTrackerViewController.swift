@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol NewTrackerViewControllerProtocol: AnyObject {
+protocol NewTrackerViewControllerProtocol: AnyObject, ErrorAlertPresenting {
     var presenter: NewTrackerPresenterProtocol? { get set }
     func setCreateButtonEnabled(_ isEnabled: Bool)
     func updateTable(at row: Int)
@@ -38,10 +38,16 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         static let buttonsSideInset: CGFloat = 20
         static let buttonsTopSpacing: CGFloat = 20
         static let buttonsHeight: CGFloat = 60
+        static let settingsCellFontSize: CGFloat = 17
     }
 
     private enum TrackerSection: Int, CaseIterable {
         case emoji, color
+    }
+
+    private enum SettingsRow: Int {
+        case category
+        case schedule
     }
 
     // MARK: - Properties
@@ -50,7 +56,10 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     // MARK: - Private Properties
 
-    private let settingsItems = ["Категория", "Расписание"]
+    private let settingsItems = [
+        NSLocalizedString("category.title", comment: "Category settings row title"),
+        NSLocalizedString("schedule.title", comment: "Schedule settings row title")
+    ]
 
     private let scrollView: UIScrollView = {
         let scroll = UIScrollView()
@@ -67,7 +76,6 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var titleTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая привычка"
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         label.textColor = .ypBlack
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -76,8 +84,8 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
-        textField.font = UIFont.systemFont(ofSize: 17)
+        textField.placeholder = NSLocalizedString("newTracker.namePlaceholder", comment: "Tracker name field placeholder")
+        textField.font = UIFont.systemFont(ofSize: Constants.settingsCellFontSize)
         textField.backgroundColor = UIColor(resource: .background)
         textField.layer.cornerRadius = 16
         textField.layer.masksToBounds = true
@@ -98,9 +106,18 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var lengthWarningLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("newTracker.nameLimit", comment: "Tracker name length limit warning")
         label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         label.textColor = UIColor(resource: .red)
+        label.isHidden = true
+        return label
+    }()
+
+    private lazy var daysLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 32, weight: .bold)
+        label.textAlignment = .center
+        label.textColor = .ypBlack
         label.isHidden = true
         return label
     }()
@@ -109,6 +126,14 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         let stackView = UIStackView(arrangedSubviews: [nameTextField, lengthWarningLabel])
         stackView.axis = .vertical
         stackView.spacing = 8
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+
+    private lazy var topStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [daysLabel, nameFieldStackView])
+        stackView.axis = .vertical
+        stackView.spacing = 24
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -129,7 +154,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("common.cancel", comment: "Cancel button title"), for: .normal)
         button.setTitleColor(UIColor(resource: .red), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
@@ -145,7 +170,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(NSLocalizedString("common.create", comment: "Create button title"), for: .normal)
         button.setTitleColor(UIColor(resource: .ypWhite), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
@@ -219,7 +244,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         scrollView.addSubview(contentView)
 
         contentView.addSubview(titleTextLabel)
-        contentView.addSubview(nameFieldStackView)
+        contentView.addSubview(topStackView)
         contentView.addSubview(tableView)
         contentView.addSubview(collectionView)
         contentView.addSubview(buttonsStackView)
@@ -248,13 +273,13 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
             titleTextLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             titleTextLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: Constants.sectionSpacing),
 
-            nameFieldStackView.topAnchor.constraint(equalTo: titleTextLabel.bottomAnchor, constant: Constants.sectionSpacing),
-            nameFieldStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
-            nameFieldStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
+            topStackView.topAnchor.constraint(equalTo: titleTextLabel.bottomAnchor, constant: Constants.sectionSpacing),
+            topStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
+            topStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
             nameTextField.heightAnchor.constraint(equalToConstant: Constants.nameFieldHeight),
 
             tableView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            tableView.topAnchor.constraint(equalTo: nameFieldStackView.bottomAnchor, constant: Constants.sectionSpacing),
+            tableView.topAnchor.constraint(equalTo: topStackView.bottomAnchor, constant: Constants.sectionSpacing),
             tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sideInset),
             tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sideInset),
             tableView.heightAnchor.constraint(equalToConstant: Constants.tableHeight),
@@ -270,6 +295,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
             buttonsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             buttonsStackView.heightAnchor.constraint(equalToConstant: Constants.buttonsHeight)
         ])
+        prefill()
     }
 
     private func didChangeName() {
@@ -282,6 +308,28 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
 
     private func didTapCancel() {
         dismiss(animated: true)
+    }
+
+    private func prefill() {
+        guard let presenter else { return }
+
+        titleTextLabel.text = presenter.screenTitle
+        createButton.setTitle(presenter.buttonTitle, for: .normal)
+        nameTextField.text = presenter.currentName
+
+        daysLabel.isHidden = !presenter.isEditing
+        daysLabel.text = presenter.completedDaysText
+
+        tableView.reloadData()
+        collectionView.reloadData()
+
+        if let emojiIndex = presenter.selectedEmojiIndex {
+            collectionView.selectItem(at: IndexPath(item: emojiIndex, section: 0), animated: false, scrollPosition: [])
+        }
+        if let colorIndex = presenter.selectedColorIndex {
+            collectionView.selectItem(at: IndexPath(item: colorIndex, section: 1), animated: false, scrollPosition: [])
+        }
+        setCreateButtonEnabled(presenter.isFormValid)
     }
 }
 
@@ -314,7 +362,8 @@ extension NewTrackerViewController: UITextFieldDelegate {
 extension NewTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if indexPath.row == 0 {
+        switch SettingsRow(rawValue: indexPath.row) {
+        case .category:
             let viewModel = CategoryListViewModel(selectedCategory: presenter?.currentCategory)
             let categoryViewController = CategoryListViewController()
             categoryViewController.initialize(viewModel: viewModel)
@@ -327,12 +376,13 @@ extension NewTrackerViewController: UITableViewDelegate {
             }
 
             present(categoryViewController, animated: true)
-        }
-        if indexPath.row == 1 {
+        case .schedule:
             let scheduleViewController = ScheduleViewController()
             scheduleViewController.delegate = self
             scheduleViewController.configure(selectedDays: presenter?.currentSchedule ?? [])
             present(scheduleViewController, animated: true)
+        case .none:
+            break
         }
     }
 }
@@ -354,8 +404,8 @@ extension NewTrackerViewController: UITableViewDataSource {
         var content = cell.defaultContentConfiguration()
         content.text = settingsItems[indexPath.row]
         content.secondaryText = presenter?.subtitle(for: indexPath.row)
-        content.textProperties.font = UIFont.systemFont(ofSize: 17)
-        content.secondaryTextProperties.font = UIFont.systemFont(ofSize: 17)
+        content.textProperties.font = UIFont.systemFont(ofSize: Constants.settingsCellFontSize)
+        content.secondaryTextProperties.font = UIFont.systemFont(ofSize: Constants.settingsCellFontSize)
         content.secondaryTextProperties.color = UIColor(resource: .gray)
         cell.contentConfiguration = content
         cell.isUserInteractionEnabled = true
@@ -385,8 +435,8 @@ extension NewTrackerViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch TrackerSection(rawValue: section) {
-        case .emoji: return presenter?.emojisCount ?? 0
-        case .color: return presenter?.colorsCount ?? 0
+        case .emoji: return presenter?.emojis.count ?? 0
+        case .color: return presenter?.colors.count ?? 0
         case .none: return 0
         }
     }
@@ -402,7 +452,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
     private func configureEmojiCell(for indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmojiCollectionViewCell.reuseIdentifier, for: indexPath)
         guard let emojiCell = cell as? EmojiCollectionViewCell,
-              let emoji = presenter?.emoji(at: indexPath.row) else {
+              let emoji = presenter?.emojis[indexPath.row] else {
             return UICollectionViewCell()
         }
         emojiCell.configure(with: emoji)
@@ -412,7 +462,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
     private func configureColorCell(for indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColorCollectionViewCell.reuseIdentifier, for: indexPath)
         guard let colorCell = cell as? ColorCollectionViewCell,
-              let color = presenter?.colorName(at: indexPath.row) else {
+              let color = presenter?.colors[indexPath.row] else {
             return UICollectionViewCell()
         }
         colorCell.configure(with: color)

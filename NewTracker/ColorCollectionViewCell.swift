@@ -26,10 +26,7 @@ final class ColorCollectionViewCell: UICollectionViewCell {
 
     override var isSelected: Bool {
         didSet {
-            contentView.layer.borderWidth = isSelected ? Constants.selectedBorderWidth : 0
-            contentView.layer.borderColor = isSelected
-                ? colorView.backgroundColor?.withAlphaComponent(Constants.selectedBorderAlpha).cgColor
-                : UIColor.clear.cgColor
+            updateSelectionAppearance()
         }
     }
 
@@ -59,6 +56,7 @@ final class ColorCollectionViewCell: UICollectionViewCell {
 
     func configure(with colorName: String) {
         colorView.backgroundColor = UIColor(named: colorName)
+        updateSelectionAppearance()
     }
 
     // MARK: - Private Methods
@@ -75,5 +73,12 @@ final class ColorCollectionViewCell: UICollectionViewCell {
             colorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.colorViewHorizontalInset),
             colorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Constants.colorViewVerticalInset),
         ])
+    }
+
+    private func updateSelectionAppearance() {
+        contentView.layer.borderWidth = isSelected ? Constants.selectedBorderWidth : 0
+        contentView.layer.borderColor = isSelected
+            ? (colorView.backgroundColor ?? .clear).withAlphaComponent(Constants.selectedBorderAlpha).cgColor
+            : UIColor.clear.cgColor
     }
 }

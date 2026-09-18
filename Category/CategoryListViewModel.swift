@@ -15,6 +15,8 @@ final class CategoryListViewModel {
 
     var onCategoriesChange: Binding<[CategoryCellModel]>?
     var onCategorySelect: Binding<String>?
+    var onError: Binding<String>?
+
     var numberOfRows: Int { categories.count }
 
     // MARK: - Private Properties
@@ -55,5 +57,36 @@ final class CategoryListViewModel {
     func addCategory(_ title: String) {
         store.addCategory(title: title)
         loadCategories()
+    }
+
+    func updateCategory(from oldTitle: String, to newTitle: String) {
+        do {
+            try store.updateCategory(from: oldTitle, to: newTitle)
+            if selectedCategory == oldTitle {
+                selectedCategory = newTitle
+            }
+            loadCategories()
+        } catch StoreError.entityDoesntExist {
+            onError?(NSLocalizedString("category.error.absent", comment: "Category doesnt exist error"))
+        } catch {
+            AppLogger.error("Error: \(error.localizedDescription)")
+            onError?(NSLocalizedString("error.generic", comment: "Something went wrong"))
+        }
+    }
+
+    func deleteCategory(at index: Int) {
+        let title = cell(at: index).title
+        do {
+            try store.deleteCategory(title: title)
+            if selectedCategory == title {
+                selectedCategory = nil
+            }
+            loadCategories()
+        } catch StoreError.entityDoesntExist {
+            onError?(NSLocalizedString("category.error.absent", comment: "Category doesnt exist error"))
+        } catch {
+            AppLogger.error("Error: \(error.localizedDescription)")
+            onError?(NSLocalizedString("error.generic", comment: "Something went wrong"))
+        }
     }
 }

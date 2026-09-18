@@ -9,8 +9,15 @@ import UIKit
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
+    // MARK: - Properties
+
     var window: UIWindow?
+
+    // MARK: - Private Properties
+
     private let onboardingStorage = OnboardingStorage()
+
+    // MARK: - Lifecycle
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
@@ -19,6 +26,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.makeKeyAndVisible()
         self.window = window
     }
+
+    // MARK: - Private Methods
 
     private func makeRootViewController() -> UIViewController {
         if onboardingStorage.hasSeenOnboarding {

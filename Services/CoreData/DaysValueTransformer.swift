@@ -10,6 +10,8 @@ import Foundation
 @objc
 final class DaysValueTransformer: ValueTransformer {
 
+    // MARK: - Methods
+
     override class func transformedValueClass() -> AnyClass {
         NSData.self
     }
