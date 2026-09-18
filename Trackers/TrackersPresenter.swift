@@ -117,7 +117,10 @@ final class TrackersPresenter: TrackersPresenterProtocol, TrackerCategoryStoreDe
             try trackerStore.deleteTracker(tracker.id)
         } catch StoreError.entityDoesntExist {
             view?.showErrorAlert(NSLocalizedString("tracker.error.absent", comment: "Tracker doesn't exist error"))
-        } catch {}
+        } catch {
+            AppLogger.error("Error: \(error.localizedDescription)")
+            view?.showErrorAlert(NSLocalizedString("error.generic", comment: "Something went wrong"))
+        }
     }
 
     func didSelectDate(_ date: Date) {

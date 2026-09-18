@@ -10,8 +10,8 @@ import Foundation
 protocol NewTrackerPresenterProtocol: AnyObject {
     var view: NewTrackerViewControllerProtocol? { get set }
     var currentSchedule: [WeekDay] { get }
-    var emojisCount: Int { get }
-    var colorsCount: Int { get }
+    var emojis: [String] { get }
+    var colors: [String] { get }
     var emojiSectionTitle: String { get }
     var colorSectionTitle: String { get }
     var currentCategory: String { get }
@@ -24,8 +24,6 @@ protocol NewTrackerPresenterProtocol: AnyObject {
     var isFormValid: Bool { get }
     var completedDaysText: String { get }
     func didSelectCategory(_ title: String)
-    func emoji(at index: Int) -> String
-    func colorName(at index: Int) -> String
     func didChangeName(_ name: String)
     func subtitle(for row: Int) -> String?
     func didSelectSchedule(_ schedule: [WeekDay])
@@ -43,12 +41,12 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
 
     var currentSchedule: [WeekDay] { trackerDraft.schedule }
 
-    var emojisCount: Int {
-        TrackerOptions.emojis.count
+    var emojis: [String] {
+        TrackerOptions.emojis
     }
 
-    var colorsCount: Int {
-        TrackerOptions.colors.count
+    var colors: [String] {
+        TrackerOptions.colors
     }
 
     var emojiSectionTitle: String { emojiTitle }
@@ -127,14 +125,6 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
         view?.setCreateButtonEnabled(validateNewTrackerForm())
     }
 
-    func emoji(at index: Int) -> String {
-        TrackerOptions.emojis[index]
-    }
-
-    func colorName(at index: Int) -> String {
-        TrackerOptions.colors[index]
-    }
-
     func subtitle(for row: Int) -> String? {
         if row == 0 {
             return self.trackerDraft.category
@@ -164,7 +154,10 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
                 try trackerStore.updateTracker(tracker, toCategory: trackerDraft.category)
             } catch StoreError.entityDoesntExist {
                 view?.showErrorAlert(NSLocalizedString("tracker.error.absent", comment: "Tracker doesn't exist error"))
-            } catch {}
+            } catch {
+                AppLogger.error("Error: \(error.localizedDescription)")
+                view?.showErrorAlert(NSLocalizedString("error.generic", comment: "Something went wrong"))
+            }
         } else {
             let tracker = Tracker(id: UUID(), title: trackerDraft.name, color: color, emoji: emoji, schedule: trackerDraft.schedule)
             trackerStore.addTracker(tracker, toCategory: trackerDraft.category)

@@ -14,6 +14,7 @@
 		788992D53051EEE9006F8A4D /* OnboardingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788992D43051EEE9006F8A4D /* OnboardingStorage.swift */; };
 		788AD4963058590C0050CCE0 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 788AD4943058590C0050CCE0 /* Localizable.strings */; };
 		788AD499305859180050CCE0 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 788AD497305859180050CCE0 /* Localizable.stringsdict */; };
+		78CBF1EA305D2097003C299E /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78CBF1E9305D2097003C299E /* AppLogger.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +42,7 @@
 		788AD498305859180050CCE0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		78C0DE1A00000000000000E1 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		78C0DE1A00000000000000E2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = ru.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		78CBF1E9305D2097003C299E /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		78D78B66301FA2A300EC6EBF /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		78D78B7C301FA2A400EC6EBF /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		78D78B86301FA2A400EC6EBF /* TrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -211,6 +213,7 @@
 				788992D43051EEE9006F8A4D /* OnboardingStorage.swift */,
 				785D57DD305B299B0086466C /* Analytics.swift */,
 				785D57EB305B33B50086466C /* FilterStorage.swift */,
+				78CBF1E9305D2097003C299E /* AppLogger.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -411,6 +414,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				788992D53051EEE9006F8A4D /* OnboardingStorage.swift in Sources */,
+				78CBF1EA305D2097003C299E /* AppLogger.swift in Sources */,
 				785D57EC305B33B50086466C /* FilterStorage.swift in Sources */,
 				785D57DE305B299B0086466C /* Analytics.swift in Sources */,
 			);

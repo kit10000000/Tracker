@@ -68,7 +68,10 @@ final class CategoryListViewModel {
             loadCategories()
         } catch StoreError.entityDoesntExist {
             onError?(NSLocalizedString("category.error.absent", comment: "Category doesnt exist error"))
-        } catch {}
+        } catch {
+            AppLogger.error("Error: \(error.localizedDescription)")
+            onError?(NSLocalizedString("error.generic", comment: "Something went wrong"))
+        }
     }
 
     func deleteCategory(at index: Int) {
@@ -81,6 +84,9 @@ final class CategoryListViewModel {
             loadCategories()
         } catch StoreError.entityDoesntExist {
             onError?(NSLocalizedString("category.error.absent", comment: "Category doesnt exist error"))
-        } catch {}
+        } catch {
+            AppLogger.error("Error: \(error.localizedDescription)")
+            onError?(NSLocalizedString("error.generic", comment: "Something went wrong"))
+        }
     }
 }

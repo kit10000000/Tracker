@@ -82,3 +82,6 @@
 "filter.completed" = "Completed";
 "filter.uncompleted" = "Uncompleted";
 "filter.title" = "Filters";
+
+
+"error.generic" = "Something went wrong";

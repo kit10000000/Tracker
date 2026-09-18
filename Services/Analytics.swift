@@ -17,9 +17,16 @@ enum AnalyticsItem: String {
     case track, filter, edit, delete
 }
 
+enum AnalyticsScreen: String {
+    case main = "Main"
+    case statistics = "Statistics"
+}
+
 final class Analytics {
-    func report(_ event: AnalyticsEvent, item: AnalyticsItem? = nil) {
-        var params: [AnyHashable: Any] = ["screen": "Main"]
+    func report(_ event: AnalyticsEvent, screen: AnalyticsScreen, item: AnalyticsItem? = nil) {
+        var params: [AnyHashable: Any] = [
+            "screen": screen.rawValue
+        ]
         if let item { params["item"] = item.rawValue }
         #if DEBUG
         print("Analytics event: \(event.rawValue), params: \(params)")

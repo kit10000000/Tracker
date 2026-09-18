@@ -45,6 +45,11 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         case emoji, color
     }
 
+    private enum SettingsRow: Int {
+        case category
+        case schedule
+    }
+
     // MARK: - Properties
 
     var presenter: NewTrackerPresenterProtocol?
@@ -357,7 +362,8 @@ extension NewTrackerViewController: UITextFieldDelegate {
 extension NewTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if indexPath.row == 0 {
+        switch SettingsRow(rawValue: indexPath.row) {
+        case .category:
             let viewModel = CategoryListViewModel(selectedCategory: presenter?.currentCategory)
             let categoryViewController = CategoryListViewController()
             categoryViewController.initialize(viewModel: viewModel)
@@ -370,12 +376,13 @@ extension NewTrackerViewController: UITableViewDelegate {
             }
 
             present(categoryViewController, animated: true)
-        }
-        if indexPath.row == 1 {
+        case .schedule:
             let scheduleViewController = ScheduleViewController()
             scheduleViewController.delegate = self
             scheduleViewController.configure(selectedDays: presenter?.currentSchedule ?? [])
             present(scheduleViewController, animated: true)
+        case .none:
+            break
         }
     }
 }
@@ -428,8 +435,8 @@ extension NewTrackerViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch TrackerSection(rawValue: section) {
-        case .emoji: return presenter?.emojisCount ?? 0
-        case .color: return presenter?.colorsCount ?? 0
+        case .emoji: return presenter?.emojis.count ?? 0
+        case .color: return presenter?.colors.count ?? 0
         case .none: return 0
         }
     }
@@ -445,7 +452,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
     private func configureEmojiCell(for indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmojiCollectionViewCell.reuseIdentifier, for: indexPath)
         guard let emojiCell = cell as? EmojiCollectionViewCell,
-              let emoji = presenter?.emoji(at: indexPath.row) else {
+              let emoji = presenter?.emojis[indexPath.row] else {
             return UICollectionViewCell()
         }
         emojiCell.configure(with: emoji)
@@ -455,7 +462,7 @@ extension NewTrackerViewController: UICollectionViewDataSource {
     private func configureColorCell(for indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColorCollectionViewCell.reuseIdentifier, for: indexPath)
         guard let colorCell = cell as? ColorCollectionViewCell,
-              let color = presenter?.colorName(at: indexPath.row) else {
+              let color = presenter?.colors[indexPath.row] else {
             return UICollectionViewCell()
         }
         colorCell.configure(with: color)

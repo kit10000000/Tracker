@@ -43,7 +43,7 @@
 "newCategory.namePlaceholder" = "Введите название категории";
 "newCategory.error.duplicate" = "Категория с таким названием уже существует";
 
-"editCategory.title" = "Редактирвоание категории";
+"editCategory.title" = "Редактирование категории";
 
 /* MARK: - Onboarding */
 "onboarding.page1.title" = "Отслеживайте только то, что хотите";
@@ -58,7 +58,7 @@
 "newTracker.section.color" = "Цвет";
 "newTracker.schedule.everyDay" = "Каждый день";
 
-"editTracker.title" = "Редакировать привычку";
+"editTracker.title" = "Редактировать привычку";
 
 /* MARK: - Weekdays (full) */
 "weekday.monday" = "Понедельник";
@@ -83,3 +83,5 @@
 "filter.completed" = "Завершенные";
 "filter.uncompleted" = "Не завершенные";
 "filter.title" = "Фильтры";
+
+"error.generic" = "Что-то пошло не так";

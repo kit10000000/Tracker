@@ -124,12 +124,12 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        analytics.report(.open)
+        analytics.report(.open, screen: .main)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        analytics.report(.close)
+        analytics.report(.close, screen: .main)
     }
 
     // MARK: - Methods
@@ -243,7 +243,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let newTrackerViewController = NewTrackerViewController()
         newTrackerViewController.configure(NewTrackerPresenter())
         present(newTrackerViewController, animated: true)
-        analytics.report(.click, item: .addTrack)
+        analytics.report(.click, screen: .main, item: .addTrack)
     }
 
     private func datePickerValueChanged() {
@@ -260,7 +260,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let vc = FilterViewController(selectedFilter: presenter?.currentFilter ?? .all)
         vc.delegate = self
         present(vc, animated: true)
-        analytics.report(.click, item: .filter)
+        analytics.report(.click, screen: .main, item: .filter)
     }
 }
 
@@ -345,11 +345,11 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                     )
                     vc.configure(NewTrackerPresenter(currentTracker: trackerDraft, completedDays: data?.days ?? 0))
                     self?.present(vc, animated: true)
-                    self?.analytics.report(.click, item: .edit)
+                    self?.analytics.report(.click, screen: .main, item: .edit)
                 },
                 UIAction(title: NSLocalizedString("common.delete", comment: "Delete tracker with context menu"), attributes: .destructive) { [weak self] _ in
                     self?.showDeleteConfirmation(at: indexPath)
-                    self?.analytics.report(.click, item: .delete)
+                    self?.analytics.report(.click, screen: .main, item: .delete)
                 },
             ])
         })
@@ -392,7 +392,7 @@ extension TrackersViewController: TrackersCollectionViewCellDelegate {
     func trackerCollectionViewCellDidTapComplete(_ cell: TrackersCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         presenter?.didTapComplete(at: indexPath.section, indexPath.row)
-        analytics.report(.click, item: .track)
+        analytics.report(.click, screen: .main, item: .track)
     }
 }
 
